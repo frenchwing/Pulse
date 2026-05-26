@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Playmate"
+version = "1.0.0"
+id = "artifacts/playmate"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24304
+
+[services.development]
+run = "pnpm --filter @workspace/playmate run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/playmate", "run", "build" ]
+publicDir = "artifacts/playmate/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24304"
+BASE_PATH = "/"
