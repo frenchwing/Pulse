@@ -6,4 +6,6 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export type SummaryStatsActivityByType = {[key: string]: number};
+export interface OtpSendInput {
+  phone: string;
+}

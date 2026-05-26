@@ -1,20 +1,20 @@
 openapi: 3.1.0
 info:
   title: Api
-  version: 0.1.0
-  description: Playmate API - find sports players and social event companions nearby
+  version: 0.2.0
+  description: Pulse API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
   - name: activities
-    description: Sports activity listings
   - name: events
-    description: Social event listings
   - name: stats
-    description: Summary statistics
+  - name: profiles
+  - name: crews
+  - name: auth
+
 paths:
   /healthz:
     get:
@@ -29,25 +29,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
 
+  # ── Activities ──────────────────────────────────────────────
   /activities:
     get:
       operationId: listActivities
       tags: [activities]
-      summary: List all sports activities
+      summary: List activities
       parameters:
-        - name: type
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
+        - { name: type, in: query, required: false, schema: { type: string } }
+        - { name: status, in: query, required: false, schema: { type: string } }
+        - { name: skillLevel, in: query, required: false, schema: { type: string } }
+        - { name: genderPref, in: query, required: false, schema: { type: string } }
+        - { name: activityKind, in: query, required: false, schema: { type: string } }
       responses:
         "200":
-          description: List of activities
+          description: List
           content:
             application/json:
               schema:
@@ -57,7 +53,7 @@ paths:
     post:
       operationId: createActivity
       tags: [activities]
-      summary: Create a sports activity
+      summary: Create an activity
       requestBody:
         required: true
         content:
@@ -76,13 +72,8 @@ paths:
     get:
       operationId: getActivity
       tags: [activities]
-      summary: Get a single activity
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
         "200":
           description: Activity
@@ -95,13 +86,8 @@ paths:
     patch:
       operationId: updateActivity
       tags: [activities]
-      summary: Update an activity
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       requestBody:
         required: true
         content:
@@ -118,13 +104,8 @@ paths:
     delete:
       operationId: deleteActivity
       tags: [activities]
-      summary: Delete an activity
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
         "204":
           description: Deleted
@@ -133,13 +114,8 @@ paths:
     post:
       operationId: joinActivity
       tags: [activities]
-      summary: Join a sports activity
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       requestBody:
         required: true
         content:
@@ -154,25 +130,52 @@ paths:
               schema:
                 $ref: "#/components/schemas/Activity"
 
+  /activities/{id}/ratings:
+    get:
+      operationId: getActivityRatings
+      tags: [activities]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Ratings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RatingItem"
+    post:
+      operationId: rateActivityPlayer
+      tags: [activities]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RatingInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RatingItem"
+
+  # ── Events ───────────────────────────────────────────────────
   /events:
     get:
       operationId: listEvents
       tags: [events]
-      summary: List all social events
       parameters:
-        - name: type
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
+        - { name: type, in: query, required: false, schema: { type: string } }
+        - { name: status, in: query, required: false, schema: { type: string } }
+        - { name: genderPref, in: query, required: false, schema: { type: string } }
       responses:
         "200":
-          description: List of events
+          description: List
           content:
             application/json:
               schema:
@@ -182,7 +185,6 @@ paths:
     post:
       operationId: createEvent
       tags: [events]
-      summary: Create a social event
       requestBody:
         required: true
         content:
@@ -201,13 +203,8 @@ paths:
     get:
       operationId: getEvent
       tags: [events]
-      summary: Get a single event
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
         "200":
           description: Event
@@ -220,13 +217,8 @@ paths:
     patch:
       operationId: updateEvent
       tags: [events]
-      summary: Update an event
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       requestBody:
         required: true
         content:
@@ -243,13 +235,8 @@ paths:
     delete:
       operationId: deleteEvent
       tags: [events]
-      summary: Delete an event
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
         "204":
           description: Deleted
@@ -258,13 +245,8 @@ paths:
     post:
       operationId: joinEvent
       tags: [events]
-      summary: Join a social event
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       requestBody:
         required: true
         content:
@@ -279,64 +261,15 @@ paths:
               schema:
                 $ref: "#/components/schemas/Event"
 
-  /activities/{id}/ratings:
-    get:
-      operationId: getActivityRatings
-      tags: [activities]
-      summary: Get ratings for an activity
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Ratings list
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RatingItem"
-    post:
-      operationId: rateActivityPlayer
-      tags: [activities]
-      summary: Rate a player from an activity
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RatingInput"
-      responses:
-        "201":
-          description: Rating created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RatingItem"
-
   /events/{id}/ratings:
     get:
       operationId: getEventRatings
       tags: [events]
-      summary: Get ratings for an event
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
         "200":
-          description: Ratings list
+          description: Ratings
           content:
             application/json:
               schema:
@@ -346,13 +279,8 @@ paths:
     post:
       operationId: rateEventPlayer
       tags: [events]
-      summary: Rate a player from an event
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - { name: id, in: path, required: true, schema: { type: integer } }
       requestBody:
         required: true
         content:
@@ -361,312 +289,540 @@ paths:
               $ref: "#/components/schemas/RatingInput"
       responses:
         "201":
-          description: Rating created
+          description: Created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RatingItem"
 
+  # ── Stats ─────────────────────────────────────────────────────
   /stats/summary:
     get:
       operationId: getSummaryStats
       tags: [stats]
-      summary: Get summary counts grouped by type for activities and events
       responses:
         "200":
-          description: Summary stats
+          description: Stats
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SummaryStats"
+
+  # ── Profiles ──────────────────────────────────────────────────
+  /profiles:
+    get:
+      operationId: listProfiles
+      tags: [profiles]
+      parameters:
+        - { name: name, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Profile"
+    post:
+      operationId: createProfile
+      tags: [profiles]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+
+  /profiles/{id}:
+    get:
+      operationId: getProfile
+      tags: [profiles]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProfile
+      tags: [profiles]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+
+  /profiles/{id}/verify:
+    post:
+      operationId: submitKyc
+      tags: [profiles]
+      summary: Submit eKYC verification request
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KycInput"
+      responses:
+        "200":
+          description: KYC submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+
+  # ── Crews ─────────────────────────────────────────────────────
+  /crews:
+    get:
+      operationId: listCrews
+      tags: [crews]
+      parameters:
+        - { name: sport, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Crews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Crew"
+    post:
+      operationId: createCrew
+      tags: [crews]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrewInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Crew"
+
+  /crews/{id}:
+    get:
+      operationId: getCrew
+      tags: [crews]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Crew
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Crew"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateCrew
+      tags: [crews]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrewUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Crew"
+
+  # ── Auth ──────────────────────────────────────────────────────
+  /auth/otp/send:
+    post:
+      operationId: sendOtp
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OtpSendInput"
+      responses:
+        "200":
+          description: OTP sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpSendResponse"
+
+  /auth/otp/verify:
+    post:
+      operationId: verifyOtp
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OtpVerifyInput"
+      responses:
+        "200":
+          description: Verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OtpVerifyResponse"
+        "400":
+          description: Invalid OTP
 
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
+        status: { type: string }
+      required: [status]
 
     Activity:
       type: object
-      required:
-        - id
-        - title
-        - type
-        - address
-        - latitude
-        - longitude
-        - date
-        - time
-        - maxPlayers
-        - currentPlayers
-        - hostName
-        - status
-        - createdAt
+      required: [id, title, type, activityKind, address, latitude, longitude, date, time, maxPlayers, currentPlayers, hostName, hostReliabilityScore, isHostOnline, genderPref, visibility, status, createdAt]
       properties:
-        id:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          description: "pickleball | basketball | volleyball | cricket | tennis"
-        description:
-          type: ["string", "null"]
-        address:
-          type: string
-        latitude:
-          type: number
-        longitude:
-          type: number
-        date:
-          type: string
-        time:
-          type: string
-        maxPlayers:
-          type: integer
-        currentPlayers:
-          type: integer
-        hostName:
-          type: string
-        hostAvatar:
-          type: ["string", "null"]
-        status:
-          type: string
-          description: "open | full | cancelled"
-        createdAt:
-          type: string
+        id: { type: integer }
+        title: { type: string }
+        type: { type: string }
+        activityKind: { type: string }
+        description: { type: ["string", "null"] }
+        address: { type: string }
+        venue: { type: ["string", "null"] }
+        latitude: { type: number }
+        longitude: { type: number }
+        date: { type: string }
+        time: { type: string }
+        expiresAt: { type: ["string", "null"] }
+        maxPlayers: { type: integer }
+        currentPlayers: { type: integer }
+        skillLevel: { type: ["string", "null"] }
+        genderPref: { type: string }
+        venueFee: { type: ["number", "null"] }
+        estimatedCostPerPerson: { type: ["number", "null"] }
+        hostName: { type: string }
+        hostAvatar: { type: ["string", "null"] }
+        hostReliabilityScore: { type: integer }
+        isHostOnline: { type: boolean }
+        crewId: { type: ["integer", "null"] }
+        note: { type: ["string", "null"] }
+        visibility: { type: string }
+        status: { type: string }
+        createdAt: { type: string }
 
     ActivityInput:
       type: object
-      required:
-        - title
-        - type
-        - address
-        - latitude
-        - longitude
-        - date
-        - time
-        - maxPlayers
-        - hostName
+      required: [title, type, address, latitude, longitude, date, time, maxPlayers, hostName]
       properties:
-        title:
-          type: string
-        type:
-          type: string
-        description:
-          type: string
-        address:
-          type: string
-        latitude:
-          type: number
-        longitude:
-          type: number
-        date:
-          type: string
-        time:
-          type: string
-        maxPlayers:
-          type: integer
-        hostName:
-          type: string
-        hostAvatar:
-          type: string
+        title: { type: string }
+        type: { type: string }
+        activityKind: { type: string }
+        description: { type: string }
+        address: { type: string }
+        venue: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        date: { type: string }
+        time: { type: string }
+        expiresAt: { type: string }
+        maxPlayers: { type: integer }
+        skillLevel: { type: string }
+        genderPref: { type: string }
+        venueFee: { type: number }
+        estimatedCostPerPerson: { type: number }
+        hostName: { type: string }
+        hostAvatar: { type: string }
+        crewId: { type: integer }
+        note: { type: string }
+        visibility: { type: string }
 
     ActivityUpdate:
       type: object
       properties:
-        title:
-          type: string
-        description:
-          type: string
-        date:
-          type: string
-        time:
-          type: string
-        maxPlayers:
-          type: integer
-        status:
-          type: string
+        title: { type: string }
+        description: { type: string }
+        date: { type: string }
+        time: { type: string }
+        maxPlayers: { type: integer }
+        skillLevel: { type: string }
+        genderPref: { type: string }
+        venueFee: { type: number }
+        estimatedCostPerPerson: { type: number }
+        status: { type: string }
+        note: { type: string }
+        isHostOnline: { type: boolean }
 
     Event:
       type: object
-      required:
-        - id
-        - title
-        - type
-        - address
-        - latitude
-        - longitude
-        - date
-        - time
-        - maxAttendees
-        - currentAttendees
-        - hostName
-        - status
-        - createdAt
+      required: [id, title, type, address, latitude, longitude, date, time, maxAttendees, currentAttendees, hostName, status, createdAt]
       properties:
-        id:
-          type: integer
-        title:
-          type: string
-        type:
-          type: string
-          description: "museum | coffee | other"
-        description:
-          type: ["string", "null"]
-        address:
-          type: string
-        latitude:
-          type: number
-        longitude:
-          type: number
-        date:
-          type: string
-        time:
-          type: string
-        maxAttendees:
-          type: integer
-        currentAttendees:
-          type: integer
-        hostName:
-          type: string
-        hostAvatar:
-          type: ["string", "null"]
-        status:
-          type: string
-          description: "open | full | cancelled"
-        createdAt:
-          type: string
+        id: { type: integer }
+        title: { type: string }
+        type: { type: string }
+        description: { type: ["string", "null"] }
+        address: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        date: { type: string }
+        time: { type: string }
+        maxAttendees: { type: integer }
+        currentAttendees: { type: integer }
+        hostName: { type: string }
+        hostAvatar: { type: ["string", "null"] }
+        genderPref: { type: string }
+        estimatedCostPerPerson: { type: ["number", "null"] }
+        status: { type: string }
+        createdAt: { type: string }
 
     EventInput:
       type: object
-      required:
-        - title
-        - type
-        - address
-        - latitude
-        - longitude
-        - date
-        - time
-        - maxAttendees
-        - hostName
+      required: [title, type, address, latitude, longitude, date, time, maxAttendees, hostName]
       properties:
-        title:
-          type: string
-        type:
-          type: string
-        description:
-          type: string
-        address:
-          type: string
-        latitude:
-          type: number
-        longitude:
-          type: number
-        date:
-          type: string
-        time:
-          type: string
-        maxAttendees:
-          type: integer
-        hostName:
-          type: string
-        hostAvatar:
-          type: string
+        title: { type: string }
+        type: { type: string }
+        description: { type: string }
+        address: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        date: { type: string }
+        time: { type: string }
+        maxAttendees: { type: integer }
+        hostName: { type: string }
+        hostAvatar: { type: string }
+        genderPref: { type: string }
+        estimatedCostPerPerson: { type: number }
 
     EventUpdate:
       type: object
       properties:
-        title:
-          type: string
-        description:
-          type: string
-        date:
-          type: string
-        time:
-          type: string
-        maxAttendees:
-          type: integer
-        status:
-          type: string
+        title: { type: string }
+        description: { type: string }
+        date: { type: string }
+        time: { type: string }
+        maxAttendees: { type: integer }
+        genderPref: { type: string }
+        status: { type: string }
 
     JoinInput:
       type: object
-      required:
-        - name
+      required: [name]
       properties:
-        name:
-          type: string
+        name: { type: string }
 
     RatingInput:
       type: object
-      required:
-        - fromName
-        - toName
-        - score
+      required: [fromName, toName, score]
       properties:
-        fromName:
-          type: string
-        toName:
-          type: string
-        score:
-          type: integer
-          minimum: 1
-          maximum: 10
+        fromName: { type: string }
+        toName: { type: string }
+        score: { type: integer, minimum: 1, maximum: 10 }
 
     RatingItem:
       type: object
-      required:
-        - id
-        - entityType
-        - entityId
-        - fromName
-        - toName
-        - score
-        - createdAt
+      required: [id, entityType, entityId, fromName, toName, score, createdAt]
       properties:
-        id:
-          type: integer
-        entityType:
-          type: string
-        entityId:
-          type: integer
-        fromName:
-          type: string
-        toName:
-          type: string
-        score:
-          type: integer
-        createdAt:
-          type: string
+        id: { type: integer }
+        entityType: { type: string }
+        entityId: { type: integer }
+        fromName: { type: string }
+        toName: { type: string }
+        score: { type: integer }
+        createdAt: { type: string }
 
     SummaryStats:
       type: object
-      required:
-        - totalActivities
-        - totalEvents
-        - openActivities
-        - openEvents
-        - activityByType
-        - eventByType
+      required: [totalActivities, totalEvents, openActivities, openEvents, activityByType, eventByType]
       properties:
-        totalActivities:
-          type: integer
-        totalEvents:
-          type: integer
-        openActivities:
-          type: integer
-        openEvents:
-          type: integer
+        totalActivities: { type: integer }
+        totalEvents: { type: integer }
+        openActivities: { type: integer }
+        openEvents: { type: integer }
         activityByType:
           type: object
-          additionalProperties:
-            type: integer
+          additionalProperties: { type: integer }
         eventByType:
           type: object
-          additionalProperties:
-            type: integer
+          additionalProperties: { type: integer }
+
+    Profile:
+      type: object
+      required: [id, name, locationCity, gender, womenOnlyPref, isVerified, kycStatus, gamesPlayed, gamesHosted, streakWeeks, reputationTags, sports, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        phone: { type: ["string", "null"] }
+        bio: { type: ["string", "null"] }
+        avatarUrl: { type: ["string", "null"] }
+        locationCity: { type: string }
+        locationArea: { type: ["string", "null"] }
+        gender: { type: string }
+        womenOnlyPref: { type: boolean }
+        isVerified: { type: boolean }
+        kycStatus: { type: string }
+        gamesPlayed: { type: integer }
+        gamesHosted: { type: integer }
+        streakWeeks: { type: integer }
+        reputationTags:
+          type: array
+          items: { type: string }
+        sports:
+          type: array
+          items:
+            type: object
+            properties:
+              sport: { type: string }
+              skillLevel: { type: string }
+            required: [sport, skillLevel]
+        createdAt: { type: string }
+
+    ProfileInput:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        phone: { type: string }
+        bio: { type: string }
+        avatarUrl: { type: string }
+        locationCity: { type: string }
+        locationArea: { type: string }
+        gender: { type: string }
+        womenOnlyPref: { type: boolean }
+        sports:
+          type: array
+          items:
+            type: object
+            properties:
+              sport: { type: string }
+              skillLevel: { type: string }
+            required: [sport, skillLevel]
+
+    ProfileUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        bio: { type: string }
+        avatarUrl: { type: string }
+        locationArea: { type: string }
+        gender: { type: string }
+        womenOnlyPref: { type: boolean }
+        sports:
+          type: array
+          items:
+            type: object
+            properties:
+              sport: { type: string }
+              skillLevel: { type: string }
+            required: [sport, skillLevel]
+        reputationTags:
+          type: array
+          items: { type: string }
+        gamesPlayed: { type: integer }
+        gamesHosted: { type: integer }
+        streakWeeks: { type: integer }
+
+    KycInput:
+      type: object
+      required: [docNumber, docType]
+      properties:
+        docNumber: { type: string }
+        docType: { type: string }
+
+    Crew:
+      type: object
+      required: [id, name, hostName, memberCount, memberNames, isPublic, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: ["string", "null"] }
+        hostName: { type: string }
+        sport: { type: ["string", "null"] }
+        memberNames:
+          type: array
+          items: { type: string }
+        memberCount: { type: integer }
+        isPublic: { type: boolean }
+        createdAt: { type: string }
+
+    CrewInput:
+      type: object
+      required: [name, hostName]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        hostName: { type: string }
+        sport: { type: string }
+        memberNames:
+          type: array
+          items: { type: string }
+        isPublic: { type: boolean }
+
+    CrewUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+        sport: { type: string }
+        memberNames:
+          type: array
+          items: { type: string }
+        isPublic: { type: boolean }
+
+    OtpSendInput:
+      type: object
+      required: [phone]
+      properties:
+        phone: { type: string }
+
+    OtpSendResponse:
+      type: object
+      required: [message, devCode]
+      properties:
+        message: { type: string }
+        devCode: { type: string }
+
+    OtpVerifyInput:
+      type: object
+      required: [phone, code]
+      properties:
+        phone: { type: string }
+        code: { type: string }
+
+    OtpVerifyResponse:
+      type: object
+      required: [verified, profileId]
+      properties:
+        verified: { type: boolean }
+        profileId: { type: ["integer", "null"] }
+        isNewUser: { type: boolean }

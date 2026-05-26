@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Plus, Map, List } from "lucide-react";
+import { Plus, Map, List, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -14,6 +14,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </Link>
           <nav className="flex items-center space-x-4 flex-1">
             <Link href="/" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/" ? "text-primary" : "text-muted-foreground"}`}>
+              <span className="flex items-center gap-2"><Home className="w-4 h-4"/> Feed</span>
+            </Link>
+            <Link href="/map" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/map" ? "text-primary" : "text-muted-foreground"}`}>
               <span className="flex items-center gap-2"><Map className="w-4 h-4"/> Map</span>
             </Link>
             <Link href="/browse" className={`text-sm font-medium transition-colors hover:text-primary ${location === "/browse" ? "text-primary" : "text-muted-foreground"}`}>
