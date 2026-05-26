@@ -651,6 +651,95 @@ export const UpdateCrewResponse = zod.object({
 })
 
 
+export const ListClubsQueryParams = zod.object({
+  "sport": zod.coerce.string().optional()
+})
+
+export const ListClubsResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "tagline": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "leaderName": zod.string(),
+  "leaderPhone": zod.string().nullish(),
+  "sport": zod.string(),
+  "memberNames": zod.array(zod.string()),
+  "memberCount": zod.number(),
+  "maxMembers": zod.number().nullish(),
+  "isExclusive": zod.boolean(),
+  "city": zod.string(),
+  "area": zod.string().nullish(),
+  "coverColor": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+export const ListClubsResponse = zod.array(ListClubsResponseItem)
+
+
+export const CreateClubBody = zod.object({
+  "name": zod.string(),
+  "tagline": zod.string().optional(),
+  "description": zod.string().optional(),
+  "leaderName": zod.string(),
+  "leaderPhone": zod.string().optional(),
+  "sport": zod.string(),
+  "memberNames": zod.array(zod.string()).optional(),
+  "maxMembers": zod.number().optional(),
+  "isExclusive": zod.boolean().optional(),
+  "area": zod.string().optional(),
+  "coverColor": zod.string().optional()
+})
+
+
+export const GetClubParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetClubResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "tagline": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "leaderName": zod.string(),
+  "leaderPhone": zod.string().nullish(),
+  "sport": zod.string(),
+  "memberNames": zod.array(zod.string()),
+  "memberCount": zod.number(),
+  "maxMembers": zod.number().nullish(),
+  "isExclusive": zod.boolean(),
+  "city": zod.string(),
+  "area": zod.string().nullish(),
+  "coverColor": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+export const SubmitClubInquiryParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SubmitClubInquiryBody = zod.object({
+  "applicantName": zod.string(),
+  "applicantPhone": zod.string().optional(),
+  "message": zod.string().optional()
+})
+
+
+export const ListClubInquiriesParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListClubInquiriesResponseItem = zod.object({
+  "id": zod.number(),
+  "clubId": zod.number(),
+  "applicantName": zod.string(),
+  "applicantPhone": zod.string().nullish(),
+  "message": zod.string().nullish(),
+  "status": zod.string(),
+  "createdAt": zod.string()
+})
+export const ListClubInquiriesResponse = zod.array(ListClubInquiriesResponseItem)
+
+
 export const SendOtpBody = zod.object({
   "phone": zod.string()
 })

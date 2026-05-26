@@ -463,6 +463,91 @@ paths:
               schema:
                 $ref: "#/components/schemas/Crew"
 
+  # ── Clubs ─────────────────────────────────────────────────────
+  /clubs:
+    get:
+      operationId: listClubs
+      tags: [clubs]
+      parameters:
+        - { name: sport, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Clubs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Club2"
+    post:
+      operationId: createClub
+      tags: [clubs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClubInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Club2"
+
+  /clubs/{id}:
+    get:
+      operationId: getClub
+      tags: [clubs]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Club
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Club2"
+        "404":
+          description: Not found
+
+  /clubs/{id}/inquire:
+    post:
+      operationId: submitClubInquiry
+      tags: [clubs]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClubInquiryInput"
+      responses:
+        "201":
+          description: Inquiry submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClubInquiry"
+
+  /clubs/{id}/inquiries:
+    get:
+      operationId: listClubInquiries
+      tags: [clubs]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: Inquiries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClubInquiry"
+
   # ── Auth ──────────────────────────────────────────────────────
   /auth/otp/send:
     post:
@@ -826,3 +911,63 @@ components:
         verified: { type: boolean }
         profileId: { type: ["integer", "null"] }
         isNewUser: { type: boolean }
+
+    Club2:
+      type: object
+      required: [id, name, leaderName, sport, memberNames, memberCount, isExclusive, city, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        tagline: { type: ["string", "null"] }
+        description: { type: ["string", "null"] }
+        leaderName: { type: string }
+        leaderPhone: { type: ["string", "null"] }
+        sport: { type: string }
+        memberNames:
+          type: array
+          items: { type: string }
+        memberCount: { type: integer }
+        maxMembers: { type: ["integer", "null"] }
+        isExclusive: { type: boolean }
+        city: { type: string }
+        area: { type: ["string", "null"] }
+        coverColor: { type: ["string", "null"] }
+        createdAt: { type: string }
+
+    ClubInput:
+      type: object
+      required: [name, leaderName, sport]
+      properties:
+        name: { type: string }
+        tagline: { type: string }
+        description: { type: string }
+        leaderName: { type: string }
+        leaderPhone: { type: string }
+        sport: { type: string }
+        memberNames:
+          type: array
+          items: { type: string }
+        maxMembers: { type: integer }
+        isExclusive: { type: boolean }
+        area: { type: string }
+        coverColor: { type: string }
+
+    ClubInquiryInput:
+      type: object
+      required: [applicantName]
+      properties:
+        applicantName: { type: string }
+        applicantPhone: { type: string }
+        message: { type: string }
+
+    ClubInquiry:
+      type: object
+      required: [id, clubId, applicantName, status, createdAt]
+      properties:
+        id: { type: integer }
+        clubId: { type: integer }
+        applicantName: { type: string }
+        applicantPhone: { type: ["string", "null"] }
+        message: { type: ["string", "null"] }
+        status: { type: string }
+        createdAt: { type: string }

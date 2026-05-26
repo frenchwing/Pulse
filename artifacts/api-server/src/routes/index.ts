@@ -7,6 +7,7 @@ import ratingsRouter from "./ratings";
 import profilesRouter from "./profiles";
 import crewsRouter from "./crews";
 import authRouter from "./auth";
+import clubsRouter from "./clubs";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(ratingsRouter);
 router.use(profilesRouter);
 router.use(crewsRouter);
 router.use(authRouter);
+router.use(clubsRouter);
 
 export default router;

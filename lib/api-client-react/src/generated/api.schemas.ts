@@ -295,6 +295,62 @@ export interface OtpVerifyResponse {
   isNewUser?: boolean;
 }
 
+export interface Club2 {
+  id: number;
+  name: string;
+  /** @nullable */
+  tagline?: string | null;
+  /** @nullable */
+  description?: string | null;
+  leaderName: string;
+  /** @nullable */
+  leaderPhone?: string | null;
+  sport: string;
+  memberNames: string[];
+  memberCount: number;
+  /** @nullable */
+  maxMembers?: number | null;
+  isExclusive: boolean;
+  city: string;
+  /** @nullable */
+  area?: string | null;
+  /** @nullable */
+  coverColor?: string | null;
+  createdAt: string;
+}
+
+export interface ClubInput {
+  name: string;
+  tagline?: string;
+  description?: string;
+  leaderName: string;
+  leaderPhone?: string;
+  sport: string;
+  memberNames?: string[];
+  maxMembers?: number;
+  isExclusive?: boolean;
+  area?: string;
+  coverColor?: string;
+}
+
+export interface ClubInquiryInput {
+  applicantName: string;
+  applicantPhone?: string;
+  message?: string;
+}
+
+export interface ClubInquiry {
+  id: number;
+  clubId: number;
+  applicantName: string;
+  /** @nullable */
+  applicantPhone?: string | null;
+  /** @nullable */
+  message?: string | null;
+  status: string;
+  createdAt: string;
+}
+
 export type ListActivitiesParams = {
 type?: string;
 status?: string;
@@ -314,6 +370,10 @@ name?: string;
 };
 
 export type ListCrewsParams = {
+sport?: string;
+};
+
+export type ListClubsParams = {
 sport?: string;
 };
 

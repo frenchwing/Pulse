@@ -10,7 +10,8 @@ import {
   Event
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Shield, MapPin, Clock, Users, ArrowRight, User } from "lucide-react";
+import { Shield, MapPin, Clock, Users, ArrowRight } from "lucide-react";
+import { sportEmoji, sportColor } from "@/lib/sport-meta";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -121,8 +122,8 @@ export default function FeedPage() {
         {/* Top badges */}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 capitalize font-bold">
-              {item.type}
+            <Badge variant="outline" className={`capitalize font-bold border ${sportColor(item.type)}`}>
+              {sportEmoji(item.type)} {item.type}
             </Badge>
             {!isEvent && (item as any).activityKind && (
               <Badge variant="outline" className="capitalize text-muted-foreground">
