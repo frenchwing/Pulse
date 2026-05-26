@@ -30,6 +30,8 @@ import type {
   JoinInput,
   ListActivitiesParams,
   ListEventsParams,
+  RatingInput,
+  RatingItem,
   SummaryStats
 } from './api.schemas';
 
@@ -1012,6 +1014,304 @@ export const useJoinEvent = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getJoinEventMutationOptions(options));
+    }
+
+export const getGetActivityRatingsUrl = (id: number,) => {
+
+
+
+
+  return `/api/activities/${id}/ratings`
+}
+
+/**
+ * @summary Get ratings for an activity
+ */
+export const getActivityRatings = async (id: number, options?: RequestInit): Promise<RatingItem[]> => {
+
+  return customFetch<RatingItem[]>(getGetActivityRatingsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetActivityRatingsQueryKey = (id: number,) => {
+    return [
+    `/api/activities/${id}/ratings`
+    ] as const;
+    }
+
+
+export const getGetActivityRatingsQueryOptions = <TData = Awaited<ReturnType<typeof getActivityRatings>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActivityRatings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActivityRatingsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActivityRatings>>> = ({ signal }) => getActivityRatings(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getActivityRatings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetActivityRatingsQueryResult = NonNullable<Awaited<ReturnType<typeof getActivityRatings>>>
+export type GetActivityRatingsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get ratings for an activity
+ */
+
+export function useGetActivityRatings<TData = Awaited<ReturnType<typeof getActivityRatings>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getActivityRatings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetActivityRatingsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRateActivityPlayerUrl = (id: number,) => {
+
+
+
+
+  return `/api/activities/${id}/ratings`
+}
+
+/**
+ * @summary Rate a player from an activity
+ */
+export const rateActivityPlayer = async (id: number,
+    ratingInput: RatingInput, options?: RequestInit): Promise<RatingItem> => {
+
+  return customFetch<RatingItem>(getRateActivityPlayerUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      ratingInput,)
+  }
+);}
+
+
+
+
+export const getRateActivityPlayerMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rateActivityPlayer>>, TError,{id: number;data: BodyType<RatingInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rateActivityPlayer>>, TError,{id: number;data: BodyType<RatingInput>}, TContext> => {
+
+const mutationKey = ['rateActivityPlayer'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rateActivityPlayer>>, {id: number;data: BodyType<RatingInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  rateActivityPlayer(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RateActivityPlayerMutationResult = NonNullable<Awaited<ReturnType<typeof rateActivityPlayer>>>
+    export type RateActivityPlayerMutationBody = BodyType<RatingInput>
+    export type RateActivityPlayerMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Rate a player from an activity
+ */
+export const useRateActivityPlayer = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rateActivityPlayer>>, TError,{id: number;data: BodyType<RatingInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rateActivityPlayer>>,
+        TError,
+        {id: number;data: BodyType<RatingInput>},
+        TContext
+      > => {
+      return useMutation(getRateActivityPlayerMutationOptions(options));
+    }
+
+export const getGetEventRatingsUrl = (id: number,) => {
+
+
+
+
+  return `/api/events/${id}/ratings`
+}
+
+/**
+ * @summary Get ratings for an event
+ */
+export const getEventRatings = async (id: number, options?: RequestInit): Promise<RatingItem[]> => {
+
+  return customFetch<RatingItem[]>(getGetEventRatingsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEventRatingsQueryKey = (id: number,) => {
+    return [
+    `/api/events/${id}/ratings`
+    ] as const;
+    }
+
+
+export const getGetEventRatingsQueryOptions = <TData = Awaited<ReturnType<typeof getEventRatings>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEventRatings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEventRatingsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEventRatings>>> = ({ signal }) => getEventRatings(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEventRatings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEventRatingsQueryResult = NonNullable<Awaited<ReturnType<typeof getEventRatings>>>
+export type GetEventRatingsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get ratings for an event
+ */
+
+export function useGetEventRatings<TData = Awaited<ReturnType<typeof getEventRatings>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEventRatings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEventRatingsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getRateEventPlayerUrl = (id: number,) => {
+
+
+
+
+  return `/api/events/${id}/ratings`
+}
+
+/**
+ * @summary Rate a player from an event
+ */
+export const rateEventPlayer = async (id: number,
+    ratingInput: RatingInput, options?: RequestInit): Promise<RatingItem> => {
+
+  return customFetch<RatingItem>(getRateEventPlayerUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      ratingInput,)
+  }
+);}
+
+
+
+
+export const getRateEventPlayerMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rateEventPlayer>>, TError,{id: number;data: BodyType<RatingInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rateEventPlayer>>, TError,{id: number;data: BodyType<RatingInput>}, TContext> => {
+
+const mutationKey = ['rateEventPlayer'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rateEventPlayer>>, {id: number;data: BodyType<RatingInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  rateEventPlayer(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RateEventPlayerMutationResult = NonNullable<Awaited<ReturnType<typeof rateEventPlayer>>>
+    export type RateEventPlayerMutationBody = BodyType<RatingInput>
+    export type RateEventPlayerMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Rate a player from an event
+ */
+export const useRateEventPlayer = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rateEventPlayer>>, TError,{id: number;data: BodyType<RatingInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rateEventPlayer>>,
+        TError,
+        {id: number;data: BodyType<RatingInput>},
+        TContext
+      > => {
+      return useMutation(getRateEventPlayerMutationOptions(options));
     }
 
 export const getGetSummaryStatsUrl = () => {

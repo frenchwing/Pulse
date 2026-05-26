@@ -103,6 +103,26 @@ export interface JoinInput {
   name: string;
 }
 
+export interface RatingInput {
+  fromName: string;
+  toName: string;
+  /**
+     * @minimum 1
+     * @maximum 10
+     */
+  score: number;
+}
+
+export interface RatingItem {
+  id: number;
+  entityType: string;
+  entityId: number;
+  fromName: string;
+  toName: string;
+  score: number;
+  createdAt: string;
+}
+
 export type SummaryStatsActivityByType = {[key: string]: number};
 
 export type SummaryStatsEventByType = {[key: string]: number};

@@ -307,6 +307,80 @@ export const JoinEventResponse = zod.object({
 
 
 /**
+ * @summary Get ratings for an activity
+ */
+export const GetActivityRatingsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetActivityRatingsResponseItem = zod.object({
+  "id": zod.number(),
+  "entityType": zod.string(),
+  "entityId": zod.number(),
+  "fromName": zod.string(),
+  "toName": zod.string(),
+  "score": zod.number(),
+  "createdAt": zod.string()
+})
+export const GetActivityRatingsResponse = zod.array(GetActivityRatingsResponseItem)
+
+
+/**
+ * @summary Rate a player from an activity
+ */
+export const RateActivityPlayerParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const rateActivityPlayerBodyScoreMax = 10;
+
+
+
+export const RateActivityPlayerBody = zod.object({
+  "fromName": zod.string(),
+  "toName": zod.string(),
+  "score": zod.number().min(1).max(rateActivityPlayerBodyScoreMax)
+})
+
+
+/**
+ * @summary Get ratings for an event
+ */
+export const GetEventRatingsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetEventRatingsResponseItem = zod.object({
+  "id": zod.number(),
+  "entityType": zod.string(),
+  "entityId": zod.number(),
+  "fromName": zod.string(),
+  "toName": zod.string(),
+  "score": zod.number(),
+  "createdAt": zod.string()
+})
+export const GetEventRatingsResponse = zod.array(GetEventRatingsResponseItem)
+
+
+/**
+ * @summary Rate a player from an event
+ */
+export const RateEventPlayerParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const rateEventPlayerBodyScoreMax = 10;
+
+
+
+export const RateEventPlayerBody = zod.object({
+  "fromName": zod.string(),
+  "toName": zod.string(),
+  "score": zod.number().min(1).max(rateEventPlayerBodyScoreMax)
+})
+
+
+/**
  * @summary Get summary counts grouped by type for activities and events
  */
 export const GetSummaryStatsResponse = zod.object({

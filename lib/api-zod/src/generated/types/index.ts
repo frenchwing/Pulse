@@ -16,6 +16,8 @@ export * from './healthStatus';
 export * from './joinInput';
 export * from './listActivitiesParams';
 export * from './listEventsParams';
+export * from './ratingInput';
+export * from './ratingItem';
 export * from './summaryStats';
 export * from './summaryStatsActivityByType';
 export * from './summaryStatsEventByType';

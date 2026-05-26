@@ -279,6 +279,94 @@ paths:
               schema:
                 $ref: "#/components/schemas/Event"
 
+  /activities/{id}/ratings:
+    get:
+      operationId: getActivityRatings
+      tags: [activities]
+      summary: Get ratings for an activity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ratings list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RatingItem"
+    post:
+      operationId: rateActivityPlayer
+      tags: [activities]
+      summary: Rate a player from an activity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RatingInput"
+      responses:
+        "201":
+          description: Rating created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RatingItem"
+
+  /events/{id}/ratings:
+    get:
+      operationId: getEventRatings
+      tags: [events]
+      summary: Get ratings for an event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ratings list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RatingItem"
+    post:
+      operationId: rateEventPlayer
+      tags: [events]
+      summary: Rate a player from an event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RatingInput"
+      responses:
+        "201":
+          description: Rating created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RatingItem"
+
   /stats/summary:
     get:
       operationId: getSummaryStats
@@ -512,6 +600,48 @@ components:
         - name
       properties:
         name:
+          type: string
+
+    RatingInput:
+      type: object
+      required:
+        - fromName
+        - toName
+        - score
+      properties:
+        fromName:
+          type: string
+        toName:
+          type: string
+        score:
+          type: integer
+          minimum: 1
+          maximum: 10
+
+    RatingItem:
+      type: object
+      required:
+        - id
+        - entityType
+        - entityId
+        - fromName
+        - toName
+        - score
+        - createdAt
+      properties:
+        id:
+          type: integer
+        entityType:
+          type: string
+        entityId:
+          type: integer
+        fromName:
+          type: string
+        toName:
+          type: string
+        score:
+          type: integer
+        createdAt:
           type: string
 
     SummaryStats:

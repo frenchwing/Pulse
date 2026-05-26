@@ -15,10 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { ActivityInput, EventInput } from "@workspace/api-client-react";
 
-// Mock geocoding coordinates for NYC
-const getRandomNYCLocation = () => {
-  const lat = 40.7128 + (Math.random() - 0.5) * 0.1;
-  const lng = -74.0060 + (Math.random() - 0.5) * 0.1;
+// Randomize across Ahmedabad city bounds
+const getRandomAhmedabadLocation = () => {
+  const lat = 23.0225 + (Math.random() - 0.5) * 0.12;
+  const lng = 72.5714 + (Math.random() - 0.5) * 0.12;
   return { lat, lng };
 };
 
@@ -91,7 +91,7 @@ export default function CreatePage() {
   });
 
   const onSubmitActivity = (values: z.infer<typeof activitySchema>) => {
-    const loc = getRandomNYCLocation();
+    const loc = getRandomAhmedabadLocation();
     const payload: ActivityInput = {
       ...values,
       latitude: loc.lat,
@@ -101,7 +101,7 @@ export default function CreatePage() {
   };
 
   const onSubmitEvent = (values: z.infer<typeof eventSchema>) => {
-    const loc = getRandomNYCLocation();
+    const loc = getRandomAhmedabadLocation();
     const payload: EventInput = {
       ...values,
       latitude: loc.lat,
