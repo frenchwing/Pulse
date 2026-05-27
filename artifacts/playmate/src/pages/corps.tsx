@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
-  sportEmoji, sportHex, sportColor, dopeLevel, reliabilityBadge, SPORT_LABELS,
+  sportEmoji, sportHex, sportColor, dopeLevel, reliabilityBadge, memberLoyaltyColor, SPORT_LABELS, LOYALTY_TIERS,
 } from "@/lib/sport-meta";
 
 // ── Dope Level Bar ────────────────────────────────────────────────────────────
@@ -120,21 +120,29 @@ function CorpCard({ corp }: { corp: Club2 }) {
           </div>
         </div>
 
-        {/* Dope level detail */}
+        {/* Dope level + members with loyalty rings */}
         <div className="flex items-center justify-between gap-2">
           <DopeBadge level={corp.avgDopeLevel} />
           <div className="flex items-center gap-1.5">
             <div className="flex -space-x-1.5">
-              {members.slice(0, 4).map((m, i) => (
-                <div
-                  key={i}
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-black border-2 border-card"
-                  style={{ background: hex.accent, color: hex.dim }}
-                  title={m}
-                >{m.charAt(0)}</div>
-              ))}
+              {members.slice(0, 4).map((m, i) => {
+                const loyaltyColor = memberLoyaltyColor(m);
+                return (
+                  <div
+                    key={i}
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-black"
+                    style={{
+                      background: hex.accent,
+                      color: hex.dim,
+                      border: `2px solid ${loyaltyColor}`,
+                      boxShadow: `0 0 6px ${loyaltyColor}60`,
+                    }}
+                    title={`${m} · Loyalty ring`}
+                  >{m.charAt(0)}</div>
+                );
+              })}
               {members.length > 4 && (
-                <div className="w-5 h-5 rounded-full text-[8px] flex items-center justify-center border-2 border-card bg-secondary text-muted-foreground font-bold">
+                <div className="w-6 h-6 rounded-full text-[8px] flex items-center justify-center border-2 border-card bg-secondary text-muted-foreground font-bold">
                   +{members.length - 4}
                 </div>
               )}
@@ -144,6 +152,16 @@ function CorpCard({ corp }: { corp: Club2 }) {
               {corp.maxMembers ? `/${corp.maxMembers}` : ""} members
             </span>
           </div>
+        </div>
+
+        {/* Loyalty ring legend (compact) */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {LOYALTY_TIERS.map(t => (
+            <div key={t.label} className="flex items-center gap-1 text-[9px] text-muted-foreground">
+              <div className="w-2 h-2 rounded-full" style={{ background: t.color }} />
+              {t.emoji} {t.label}
+            </div>
+          ))}
         </div>
 
         <div className="text-xs text-muted-foreground flex items-center gap-1">

@@ -190,6 +190,10 @@ export interface Profile {
   locationCity: string;
   /** @nullable */
   locationArea?: string | null;
+  /** @nullable */
+  latitude?: string | null;
+  /** @nullable */
+  longitude?: string | null;
   gender: string;
   womenOnlyPref: boolean;
   isVerified: boolean;

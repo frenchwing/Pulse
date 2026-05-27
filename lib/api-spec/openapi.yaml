@@ -804,6 +804,8 @@ components:
         avatarUrl: { type: ["string", "null"] }
         locationCity: { type: string }
         locationArea: { type: ["string", "null"] }
+        latitude: { type: ["string", "null"] }
+        longitude: { type: ["string", "null"] }
         gender: { type: string }
         womenOnlyPref: { type: boolean }
         isVerified: { type: boolean }

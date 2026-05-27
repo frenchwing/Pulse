@@ -10,6 +10,8 @@ export const profilesTable = pgTable("profiles", {
   avatarUrl: text("avatar_url"),
   locationCity: text("location_city").notNull().default("Ahmedabad"),
   locationArea: text("location_area"),
+  latitude: text("latitude"),
+  longitude: text("longitude"),
   gender: text("gender").notNull().default("other"), // man|woman|other
   womenOnlyPref: boolean("women_only_pref").notNull().default(false),
   isVerified: boolean("is_verified").notNull().default(false),

@@ -97,6 +97,29 @@ export function reliabilityBadge(score: number): { label: string; emoji: string;
   return                  { label: "Ghost Mode",   emoji: "👻", color: "bg-red-500/20 text-red-300",         border: "border-red-500/40" };
 }
 
+// Loyalty badge tiers — based on streakWeeks + gamesPlayed
+export const LOYALTY_TIERS = [
+  { label: "Blazing",   emoji: "🔥", color: "#00B4E0", ringClass: "ring-[#00B4E0]",  desc: "Unstoppable — courts can't function without them"    },
+  { label: "Legend",    emoji: "👑", color: "#f59e0b", ringClass: "ring-amber-500",  desc: "Walls have their name. Courts remember their moves"   },
+  { label: "Veteran",   emoji: "⭐", color: "#94a3b8", ringClass: "ring-slate-400",  desc: "Battle-tested, always there when it counts"           },
+  { label: "Regular",   emoji: "✅", color: "#22c55e", ringClass: "ring-green-500",  desc: "Shows up, gives 100%, no drama"                       },
+  { label: "New Blood", emoji: "🌱", color: "#6b7280", ringClass: "ring-gray-500",   desc: "Still finding their footing — watch this space"       },
+] as const;
+
+export function loyaltyBadge(streakWeeks: number, gamesPlayed: number) {
+  if (streakWeeks >= 10 || gamesPlayed >= 60) return LOYALTY_TIERS[0];
+  if (streakWeeks >= 7  || gamesPlayed >= 35) return LOYALTY_TIERS[1];
+  if (streakWeeks >= 4  || gamesPlayed >= 20) return LOYALTY_TIERS[2];
+  if (streakWeeks >= 2  || gamesPlayed >= 8)  return LOYALTY_TIERS[3];
+  return LOYALTY_TIERS[4];
+}
+
+// Deterministic loyalty for a member name (no profile data available)
+export function memberLoyaltyColor(name: string): string {
+  const hash = name.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  return LOYALTY_TIERS[hash % LOYALTY_TIERS.length].color;
+}
+
 export const SPORT_LABELS: { value: string; label: string }[] = [
   { value: "badminton",  label: "Badminton" },
   { value: "tennis",     label: "Tennis" },
