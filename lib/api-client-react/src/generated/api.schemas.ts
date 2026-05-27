@@ -316,7 +316,35 @@ export interface Club2 {
   area?: string | null;
   /** @nullable */
   coverColor?: string | null;
+  reliabilityScore: number;
+  avgDopeLevel: number;
+  wins: number;
+  losses: number;
   createdAt: string;
+}
+
+export interface CorpBattle {
+  id: number;
+  corp1Id: number;
+  corp2Id: number;
+  sport: string;
+  scheduledAt: string;
+  /** @nullable */
+  location?: string | null;
+  result: string;
+  /** @nullable */
+  corp1Score?: number | null;
+  /** @nullable */
+  corp2Score?: number | null;
+  createdAt: string;
+}
+
+export interface CorpBattleInput {
+  corp1Id: number;
+  corp2Id: number;
+  sport: string;
+  scheduledAt: string;
+  location?: string;
 }
 
 export interface ClubInput {
@@ -374,6 +402,10 @@ sport?: string;
 };
 
 export type ListClubsParams = {
+sport?: string;
+};
+
+export type ListCorpBattlesParams = {
 sport?: string;
 };
 

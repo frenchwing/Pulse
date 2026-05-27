@@ -27,6 +27,8 @@ import type {
   ClubInput,
   ClubInquiry,
   ClubInquiryInput,
+  CorpBattle,
+  CorpBattleInput,
   Crew,
   CrewInput,
   CrewUpdate,
@@ -38,6 +40,7 @@ import type {
   KycInput,
   ListActivitiesParams,
   ListClubsParams,
+  ListCorpBattlesParams,
   ListCrewsParams,
   ListEventsParams,
   ListProfilesParams,
@@ -2301,6 +2304,149 @@ export function useListClubInquiries<TData = Awaited<ReturnType<typeof listClubI
 
 
 
+
+export const getListCorpBattlesUrl = (params?: ListCorpBattlesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/clubs/battles?${stringifiedParams}` : `/api/clubs/battles`
+}
+
+export const listCorpBattles = async (params?: ListCorpBattlesParams, options?: RequestInit): Promise<CorpBattle[]> => {
+
+  return customFetch<CorpBattle[]>(getListCorpBattlesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCorpBattlesQueryKey = (params?: ListCorpBattlesParams,) => {
+    return [
+    `/api/clubs/battles`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCorpBattlesQueryOptions = <TData = Awaited<ReturnType<typeof listCorpBattles>>, TError = ErrorType<unknown>>(params?: ListCorpBattlesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCorpBattles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCorpBattlesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCorpBattles>>> = ({ signal }) => listCorpBattles(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCorpBattles>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCorpBattlesQueryResult = NonNullable<Awaited<ReturnType<typeof listCorpBattles>>>
+export type ListCorpBattlesQueryError = ErrorType<unknown>
+
+
+
+export function useListCorpBattles<TData = Awaited<ReturnType<typeof listCorpBattles>>, TError = ErrorType<unknown>>(
+ params?: ListCorpBattlesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCorpBattles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCorpBattlesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateCorpBattleUrl = () => {
+
+
+
+
+  return `/api/clubs/battles`
+}
+
+export const createCorpBattle = async (corpBattleInput: CorpBattleInput, options?: RequestInit): Promise<CorpBattle> => {
+
+  return customFetch<CorpBattle>(getCreateCorpBattleUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      corpBattleInput,)
+  }
+);}
+
+
+
+
+export const getCreateCorpBattleMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCorpBattle>>, TError,{data: BodyType<CorpBattleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createCorpBattle>>, TError,{data: BodyType<CorpBattleInput>}, TContext> => {
+
+const mutationKey = ['createCorpBattle'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createCorpBattle>>, {data: BodyType<CorpBattleInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createCorpBattle(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateCorpBattleMutationResult = NonNullable<Awaited<ReturnType<typeof createCorpBattle>>>
+    export type CreateCorpBattleMutationBody = BodyType<CorpBattleInput>
+    export type CreateCorpBattleMutationError = ErrorType<unknown>
+
+    export const useCreateCorpBattle = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createCorpBattle>>, TError,{data: BodyType<CorpBattleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createCorpBattle>>,
+        TError,
+        {data: BodyType<CorpBattleInput>},
+        TContext
+      > => {
+      return useMutation(getCreateCorpBattleMutationOptions(options));
+    }
 
 export const getSendOtpUrl = () => {
 

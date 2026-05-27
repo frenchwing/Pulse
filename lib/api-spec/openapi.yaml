@@ -548,6 +548,38 @@ paths:
                 items:
                   $ref: "#/components/schemas/ClubInquiry"
 
+  /clubs/battles:
+    get:
+      operationId: listCorpBattles
+      tags: [clubs]
+      parameters:
+        - { name: sport, in: query, required: false, schema: { type: string } }
+      responses:
+        "200":
+          description: Corp battles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CorpBattle"
+    post:
+      operationId: createCorpBattle
+      tags: [clubs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CorpBattleInput"
+      responses:
+        "201":
+          description: Battle created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CorpBattle"
+
   # ── Auth ──────────────────────────────────────────────────────
   /auth/otp/send:
     post:
@@ -914,7 +946,7 @@ components:
 
     Club2:
       type: object
-      required: [id, name, leaderName, sport, memberNames, memberCount, isExclusive, city, createdAt]
+      required: [id, name, leaderName, sport, memberNames, memberCount, isExclusive, city, reliabilityScore, avgDopeLevel, wins, losses, createdAt]
       properties:
         id: { type: integer }
         name: { type: string }
@@ -932,7 +964,36 @@ components:
         city: { type: string }
         area: { type: ["string", "null"] }
         coverColor: { type: ["string", "null"] }
+        reliabilityScore: { type: integer }
+        avgDopeLevel: { type: integer }
+        wins: { type: integer }
+        losses: { type: integer }
         createdAt: { type: string }
+
+    CorpBattle:
+      type: object
+      required: [id, corp1Id, corp2Id, sport, scheduledAt, result, createdAt]
+      properties:
+        id: { type: integer }
+        corp1Id: { type: integer }
+        corp2Id: { type: integer }
+        sport: { type: string }
+        scheduledAt: { type: string }
+        location: { type: ["string", "null"] }
+        result: { type: string }
+        corp1Score: { type: ["integer", "null"] }
+        corp2Score: { type: ["integer", "null"] }
+        createdAt: { type: string }
+
+    CorpBattleInput:
+      type: object
+      required: [corp1Id, corp2Id, sport, scheduledAt]
+      properties:
+        corp1Id: { type: integer }
+        corp2Id: { type: integer }
+        sport: { type: string }
+        scheduledAt: { type: string }
+        location: { type: string }
 
     ClubInput:
       type: object

@@ -39,6 +39,24 @@ export const SPORT_COLOR: Record<string, string> = {
   other: "bg-slate-500/20 text-slate-300 border-slate-500/30",
 };
 
+// Hex color pairs per sport for inline gradient styling in the sport grid
+export const SPORT_HEX: Record<string, { accent: string; glow: string; dim: string }> = {
+  tennis:     { accent: "#fde047", glow: "#ca8a04", dim: "#1a1200" },
+  badminton:  { accent: "#60a5fa", glow: "#2563eb", dim: "#0a1628" },
+  pickleball: { accent: "#4ade80", glow: "#16a34a", dim: "#031a0c" },
+  cricket:    { accent: "#fb923c", glow: "#ea580c", dim: "#200a00" },
+  football:   { accent: "#34d399", glow: "#059669", dim: "#011a10" },
+  basketball: { accent: "#f97316", glow: "#c2410c", dim: "#1a0800" },
+  volleyball: { accent: "#c084fc", glow: "#9333ea", dim: "#17073a" },
+  running:    { accent: "#f472b6", glow: "#db2777", dim: "#1f0019" },
+  cycling:    { accent: "#22d3ee", glow: "#0891b2", dim: "#031a20" },
+  gym:        { accent: "#f87171", glow: "#dc2626", dim: "#1c0000" },
+  swimming:   { accent: "#38bdf8", glow: "#0284c7", dim: "#031525" },
+  coffee:     { accent: "#fbbf24", glow: "#b45309", dim: "#150900" },
+  throwball:  { accent: "#a78bfa", glow: "#7c3aed", dim: "#0f0527" },
+  other:      { accent: "#94a3b8", glow: "#475569", dim: "#0f172a" },
+};
+
 export function sportEmoji(type: string): string {
   return SPORT_EMOJI[type?.toLowerCase()] ?? "🏅";
 }
@@ -47,18 +65,50 @@ export function sportColor(type: string): string {
   return SPORT_COLOR[type?.toLowerCase()] ?? "bg-slate-500/20 text-slate-300 border-slate-500/30";
 }
 
+export function sportHex(type: string) {
+  return SPORT_HEX[type?.toLowerCase()] ?? { accent: "#94a3b8", glow: "#475569", dim: "#0f172a" };
+}
+
+// Dope Levels 1-10 with funny descriptions
+export const DOPE_LEVELS: Record<number, { name: string; desc: string; emoji: string; color: string }> = {
+  1:  { name: "Just Showed Up",        desc: "Not sure which end to hold",               emoji: "🐣", color: "#ef4444" },
+  2:  { name: "Getting Dressed",        desc: "Has the gear, skills still downloading",   emoji: "🌱", color: "#f87171" },
+  3:  { name: "Has a Sports Bag",       desc: "Looks the part, that's about it",          emoji: "🎒", color: "#f97316" },
+  4:  { name: "YouTube Certified",      desc: "Studied the move, never landed it",        emoji: "📱", color: "#fb923c" },
+  5:  { name: "Weekend Warrior",        desc: "Monday hero, Friday nobody",               emoji: "⚔️", color: "#eab308" },
+  6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#a3e635" },
+  7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#4ade80" },
+  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "👑", color: "#34d399" },
+  9:  { name: "Walking Highlight Reel", desc: "Coaches come to watch, not play",          emoji: "🎥", color: "#22d3ee" },
+  10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "🔥", color: "#00B4E0" },
+};
+
+export function dopeLevel(level: number) {
+  const clamped = Math.max(1, Math.min(10, Math.round(level)));
+  return DOPE_LEVELS[clamped] ?? DOPE_LEVELS[5];
+}
+
+// Reliability badges — score 0-100
+export function reliabilityBadge(score: number): { label: string; emoji: string; color: string; border: string } {
+  if (score >= 90) return { label: "Iron Guard",   emoji: "🛡️", color: "bg-green-500/20 text-green-300",   border: "border-green-500/40" };
+  if (score >= 75) return { label: "Steady Crew",  emoji: "✅", color: "bg-emerald-500/20 text-emerald-300", border: "border-emerald-500/40" };
+  if (score >= 60) return { label: "Warming Up",   emoji: "🌡️", color: "bg-yellow-500/20 text-yellow-300",  border: "border-yellow-500/40" };
+  if (score >= 40) return { label: "Hit or Miss",  emoji: "⚠️", color: "bg-orange-500/20 text-orange-300",  border: "border-orange-500/40" };
+  return                  { label: "Ghost Mode",   emoji: "👻", color: "bg-red-500/20 text-red-300",         border: "border-red-500/40" };
+}
+
 export const SPORT_LABELS: { value: string; label: string }[] = [
-  { value: "badminton", label: "Badminton" },
-  { value: "tennis", label: "Tennis" },
+  { value: "badminton",  label: "Badminton" },
+  { value: "tennis",     label: "Tennis" },
   { value: "pickleball", label: "Pickleball" },
-  { value: "football", label: "Football" },
+  { value: "football",   label: "Football" },
   { value: "basketball", label: "Basketball" },
-  { value: "cricket", label: "Cricket" },
+  { value: "cricket",    label: "Cricket" },
   { value: "volleyball", label: "Volleyball" },
-  { value: "running", label: "Running" },
-  { value: "cycling", label: "Cycling" },
-  { value: "gym", label: "Gym" },
-  { value: "swimming", label: "Swimming" },
-  { value: "throwball", label: "Throwball" },
-  { value: "other", label: "Other" },
+  { value: "running",    label: "Running" },
+  { value: "cycling",    label: "Cycling" },
+  { value: "gym",        label: "Gym" },
+  { value: "swimming",   label: "Swimming" },
+  { value: "throwball",  label: "Throwball" },
+  { value: "other",      label: "Other" },
 ];

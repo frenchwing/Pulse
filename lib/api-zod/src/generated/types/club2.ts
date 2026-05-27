@@ -27,5 +27,9 @@ export interface Club2 {
   area?: string | null;
   /** @nullable */
   coverColor?: string | null;
+  reliabilityScore: number;
+  avgDopeLevel: number;
+  wins: number;
+  losses: number;
   createdAt: string;
 }

@@ -25,7 +25,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {navItem("/", <Home className="w-4 h-4"/>, "Feed")}
             {navItem("/map", <Map className="w-4 h-4"/>, "Map")}
             {navItem("/browse", <List className="w-4 h-4"/>, "Browse")}
-            {navItem("/clubs", <Users className="w-4 h-4"/>, "Clubs")}
+            {navItem("/corps", <Users className="w-4 h-4"/>, "Corps")}
           </nav>
           <div className="flex items-center justify-end shrink-0">
             <Link href="/create">

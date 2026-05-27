@@ -12,7 +12,7 @@ import EventDetailPage from "@/pages/event-detail";
 import CreatePage from "@/pages/create";
 import ProfilePage from "@/pages/profile";
 import OnboardingPage from "@/pages/onboarding";
-import ClubsPage from "@/pages/clubs";
+import CorpsPage from "@/pages/corps";
 
 const queryClient = new QueryClient();
 
@@ -28,8 +28,8 @@ function Router() {
         <Route path="/create" component={CreatePage} />
         <Route path="/profile/:id" component={ProfilePage} />
         <Route path="/onboarding" component={OnboardingPage} />
-        <Route path="/clubs" component={ClubsPage} />
-        <Route path="/clubs/:sport" component={ClubsPage} />
+        <Route path="/corps" component={CorpsPage} />
+        <Route path="/corps/:sport" component={CorpsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

@@ -17,6 +17,23 @@ export const clubsTable = pgTable("clubs", {
   city: text("city").notNull().default("Ahmedabad"),
   area: text("area"),
   coverColor: text("cover_color"),
+  reliabilityScore: integer("reliability_score").notNull().default(80),
+  avgDopeLevel: integer("avg_dope_level").notNull().default(5),
+  wins: integer("wins").notNull().default(0),
+  losses: integer("losses").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const clubBattlesTable = pgTable("club_battles", {
+  id: serial("id").primaryKey(),
+  corp1Id: integer("corp1_id").notNull(),
+  corp2Id: integer("corp2_id").notNull(),
+  sport: text("sport").notNull(),
+  scheduledAt: timestamp("scheduled_at").notNull(),
+  location: text("location"),
+  result: text("result").notNull().default("pending"), // pending|corp1|corp2|draw
+  corp1Score: integer("corp1_score"),
+  corp2Score: integer("corp2_score"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -33,6 +50,10 @@ export const clubInquiriesTable = pgTable("club_inquiries", {
 export const insertClubSchema = createInsertSchema(clubsTable).omit({ id: true, createdAt: true });
 export type InsertClub = z.infer<typeof insertClubSchema>;
 export type Club = typeof clubsTable.$inferSelect;
+
+export const insertClubBattleSchema = createInsertSchema(clubBattlesTable).omit({ id: true, createdAt: true });
+export type InsertClubBattle = z.infer<typeof insertClubBattleSchema>;
+export type ClubBattle = typeof clubBattlesTable.$inferSelect;
 
 export const insertClubInquirySchema = createInsertSchema(clubInquiriesTable).omit({ id: true, createdAt: true });
 export type InsertClubInquiry = z.infer<typeof insertClubInquirySchema>;

@@ -670,6 +670,10 @@ export const ListClubsResponseItem = zod.object({
   "city": zod.string(),
   "area": zod.string().nullish(),
   "coverColor": zod.string().nullish(),
+  "reliabilityScore": zod.number(),
+  "avgDopeLevel": zod.number(),
+  "wins": zod.number(),
+  "losses": zod.number(),
   "createdAt": zod.string()
 })
 export const ListClubsResponse = zod.array(ListClubsResponseItem)
@@ -709,6 +713,10 @@ export const GetClubResponse = zod.object({
   "city": zod.string(),
   "area": zod.string().nullish(),
   "coverColor": zod.string().nullish(),
+  "reliabilityScore": zod.number(),
+  "avgDopeLevel": zod.number(),
+  "wins": zod.number(),
+  "losses": zod.number(),
   "createdAt": zod.string()
 })
 
@@ -738,6 +746,34 @@ export const ListClubInquiriesResponseItem = zod.object({
   "createdAt": zod.string()
 })
 export const ListClubInquiriesResponse = zod.array(ListClubInquiriesResponseItem)
+
+
+export const ListCorpBattlesQueryParams = zod.object({
+  "sport": zod.coerce.string().optional()
+})
+
+export const ListCorpBattlesResponseItem = zod.object({
+  "id": zod.number(),
+  "corp1Id": zod.number(),
+  "corp2Id": zod.number(),
+  "sport": zod.string(),
+  "scheduledAt": zod.string(),
+  "location": zod.string().nullish(),
+  "result": zod.string(),
+  "corp1Score": zod.number().nullish(),
+  "corp2Score": zod.number().nullish(),
+  "createdAt": zod.string()
+})
+export const ListCorpBattlesResponse = zod.array(ListCorpBattlesResponseItem)
+
+
+export const CreateCorpBattleBody = zod.object({
+  "corp1Id": zod.number(),
+  "corp2Id": zod.number(),
+  "sport": zod.string(),
+  "scheduledAt": zod.string(),
+  "location": zod.string().optional()
+})
 
 
 export const SendOtpBody = zod.object({
