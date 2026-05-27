@@ -216,7 +216,7 @@ export default function ActivityDetailPage() {
                   className="bg-background/50 border-input"
                 />
                 <Button
-                  className="w-full font-bold text-primary-foreground bg-primary hover:bg-primary/90 shadow-[0_0_20px_rgba(245,230,66,0.3)] transition-all hover:shadow-[0_0_30px_rgba(245,230,66,0.5)]"
+                  className="w-full font-bold text-primary-foreground bg-primary hover:bg-primary/90 shadow-[0_0_20px_rgba(0,180,224,0.3)] transition-all hover:shadow-[0_0_30px_rgba(0,180,224,0.5)]"
                   size="lg"
                   disabled={!name.trim() || joinMutation.isPending}
                   onClick={() => joinMutation.mutate({ id: activityId, data: { name } })}

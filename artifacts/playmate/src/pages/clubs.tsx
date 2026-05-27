@@ -208,7 +208,7 @@ export default function ClubsPage() {
               onClick={() => setActiveSport("all")}
               className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all border ${
                 activeSport === "all"
-                  ? "bg-primary text-primary-foreground border-primary shadow-[0_0_12px_rgba(245,230,66,0.25)]"
+                  ? "bg-primary text-primary-foreground border-primary shadow-[0_0_12px_rgba(0,180,224,0.3)]"
                   : "bg-transparent text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
               }`}
             >
@@ -220,7 +220,7 @@ export default function ClubsPage() {
                 onClick={() => setActiveSport(sport)}
                 className={`px-4 py-1.5 rounded-full text-sm font-bold transition-all border capitalize gap-1.5 flex items-center ${
                   activeSport === sport
-                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_12px_rgba(245,230,66,0.25)]"
+                    ? "bg-primary text-primary-foreground border-primary shadow-[0_0_12px_rgba(0,180,224,0.3)]"
                     : "bg-transparent text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
                 }`}
               >

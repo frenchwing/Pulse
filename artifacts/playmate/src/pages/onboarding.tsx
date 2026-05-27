@@ -416,7 +416,7 @@ export default function OnboardingPage() {
             </div>
           </div>
 
-          <Button size="lg" className="w-full bg-primary text-primary-foreground font-bold hover:bg-primary/90 text-lg py-6 gap-2 shadow-[0_0_20px_rgba(245,230,66,0.3)]" onClick={() => setLocation("/")}>
+          <Button size="lg" className="w-full bg-primary text-primary-foreground font-bold hover:bg-primary/90 text-lg py-6 gap-2 shadow-[0_0_20px_rgba(0,180,224,0.3)]" onClick={() => setLocation("/")}>
             Explore Games Near You <ArrowRight className="w-5 h-5" />
           </Button>
         </div>

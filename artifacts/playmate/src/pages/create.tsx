@@ -378,7 +378,7 @@ export default function CreatePage() {
                   />
                 </div>
 
-                <Button type="submit" size="lg" className="w-full font-bold bg-primary text-primary-foreground hover:bg-primary/90 py-6 text-lg shadow-[0_0_20px_rgba(245,230,66,0.2)]" disabled={createActivity.isPending}>
+                <Button type="submit" size="lg" className="w-full font-bold bg-primary text-primary-foreground hover:bg-primary/90 py-6 text-lg shadow-[0_0_20px_rgba(0,180,224,0.25)]" disabled={createActivity.isPending}>
                   {createActivity.isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                   Post Activity
                 </Button>

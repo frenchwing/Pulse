@@ -218,7 +218,7 @@ export default function FeedPage() {
             </Button>
             {item.status === "open" && !isEvent && (
               <Button 
-                className="flex-1 sm:flex-none bg-primary text-primary-foreground font-bold hover:bg-primary/90 shadow-[0_0_15px_rgba(245,230,66,0.2)]"
+                className="flex-1 sm:flex-none bg-primary text-primary-foreground font-bold hover:bg-primary/90 shadow-[0_0_15px_rgba(0,180,224,0.25)]"
                 onClick={() => handleJoin(item.id)}
                 disabled={joinActivity.isPending}
               >
@@ -313,7 +313,7 @@ export default function FeedPage() {
             <p className="text-muted-foreground mb-8 max-w-md mx-auto">
               The map is clear in this area. Be the first to start something and get people playing!
             </p>
-            <Button size="lg" className="bg-primary text-primary-foreground font-bold hover:bg-primary/90 gap-2 shadow-[0_0_20px_rgba(245,230,66,0.3)]" onClick={() => setLocation("/create")}>
+            <Button size="lg" className="bg-primary text-primary-foreground font-bold hover:bg-primary/90 gap-2 shadow-[0_0_20px_rgba(0,180,224,0.3)]" onClick={() => setLocation("/create")}>
               Host an Activity <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
