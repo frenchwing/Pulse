@@ -120,6 +120,39 @@ export function memberLoyaltyColor(name: string): string {
   return LOYALTY_TIERS[hash % LOYALTY_TIERS.length].color;
 }
 
+// Ghost Factor — inverse of reliability (0=never ghosts, 100=always ghosts)
+export interface GhostFactorInfo {
+  score: number;
+  label: string;
+  desc: string;
+  face: string;
+  ghosts: number;
+  color: string;
+}
+
+export function ghostFactor(reliabilityScore: number): GhostFactorInfo {
+  const score = 100 - Math.max(0, Math.min(100, reliabilityScore ?? 85));
+  if (score <= 10) return { score, label: "Solid",   desc: "Never ghosts. An absolute legend.",          face: "😁", ghosts: 1, color: "#22c55e" };
+  if (score <= 25) return { score, label: "Trusty",  desc: "Almost always shows up.",                    face: "🙂", ghosts: 1, color: "#4ade80" };
+  if (score <= 40) return { score, label: "Iffy",    desc: "Might vanish without a word.",               face: "😐", ghosts: 2, color: "#fbbf24" };
+  if (score <= 55) return { score, label: "Flaky",   desc: "Goes poof more than you'd like.",            face: "😕", ghosts: 2, color: "#f97316" };
+  if (score <= 70) return { score, label: "Spooky",  desc: "Ghosts more often than they show.",          face: "😬", ghosts: 3, color: "#ef4444" };
+  if (score <= 85) return { score, label: "Haunted", desc: "Serial ghoster. You have been warned.",      face: "😱", ghosts: 4, color: "#dc2626" };
+                   return { score, label: "Phantom", desc: "Never actually exists at the venue.",        face: "💀", ghosts: 5, color: "#7f1d1d" };
+}
+
+// Map skill level text → a specific dope level number (varies by seed so the feed shows many levels)
+export function skillToDope(skill: string, seed: number = 0): number {
+  const ranges: Record<string, [number, number]> = {
+    beginner:     [1, 3],
+    intermediate: [4, 6],
+    advanced:     [7, 8],
+    pro:          [9, 10],
+  };
+  const [min, max] = ranges[skill?.toLowerCase()] ?? [4, 6];
+  return min + (seed % (max - min + 1));
+}
+
 export const SPORT_LABELS: { value: string; label: string }[] = [
   { value: "badminton",  label: "Badminton" },
   { value: "tennis",     label: "Tennis" },

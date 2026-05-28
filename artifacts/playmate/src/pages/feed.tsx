@@ -11,7 +11,7 @@ import {
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Shield, MapPin, Clock, Users, ArrowRight } from "lucide-react";
-import { sportEmoji, sportColor } from "@/lib/sport-meta";
+import { sportEmoji, sportColor, dopeLevel, ghostFactor, skillToDope } from "@/lib/sport-meta";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -100,22 +100,15 @@ export default function FeedPage() {
     const dateStr = `${item.date}T${item.time}`;
     const dateObj = new Date(dateStr);
     
-    // Status colors
     const statusColor = item.status === "open" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400";
-    
-    // Skill Level Colors
-    let skillColor = "bg-gray-500/20 text-gray-400";
     const skill = (item as any).skillLevel?.toLowerCase();
-    if (skill === 'beginner') skillColor = "bg-green-500/20 text-green-400";
-    else if (skill === 'intermediate') skillColor = "bg-amber-500/20 text-amber-400";
-    else if (skill === 'advanced') skillColor = "bg-red-500/20 text-red-400";
-    else if (skill === 'pro') skillColor = "bg-purple-500/20 text-purple-400";
-
-    const cost = (item as any).estimatedCostPerPerson || (item as any).venueFee ? 
-      ((item as any).estimatedCostPerPerson || ((item as any).venueFee / ((item as any).maxPlayers || 1))) : 0;
-
-    const hostScore = (item as any).hostReliabilityScore || 85;
-    const scoreColor = hostScore >= 80 ? "bg-green-500" : hostScore >= 50 ? "bg-amber-500" : "bg-red-500";
+    const dopeNum = skillToDope(skill, item.id);
+    const dl = dopeLevel(dopeNum);
+    const hostScore = (item as any).hostReliabilityScore ?? 85;
+    const gf = ghostFactor(hostScore);
+    const cost = (item as any).estimatedCostPerPerson || (item as any).venueFee
+      ? ((item as any).estimatedCostPerPerson || ((item as any).venueFee / ((item as any).maxPlayers || 1)))
+      : 0;
     
     return (
       <div key={`${isEvent ? 'evt' : 'act'}-${item.id}`} className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col gap-4 relative overflow-hidden group hover:border-primary/50 transition-colors">
@@ -130,10 +123,15 @@ export default function FeedPage() {
                 {(item as any).activityKind}
               </Badge>
             )}
-            {!isEvent && (item as any).skillLevel && (
-              <Badge variant="outline" className={`capitalize border-transparent ${skillColor}`}>
-                {(item as any).skillLevel}
-              </Badge>
+            {!isEvent && skill && (
+              <div
+                className="flex items-center gap-1 rounded-full px-2.5 py-0.5 border text-xs font-bold shrink-0"
+                style={{ borderColor: `${dl.color}40`, background: `${dl.color}15`, color: dl.color }}
+              >
+                <span>{dl.emoji}</span>
+                <span>Lv.{dopeNum}</span>
+                <span className="opacity-60 text-[10px] hidden sm:inline">· {dl.name}</span>
+              </div>
             )}
             {!isEvent && (item as any).genderPref === "women_only" && (
               <Badge variant="outline" className="bg-pink-500/10 text-pink-400 border-pink-500/20 gap-1">

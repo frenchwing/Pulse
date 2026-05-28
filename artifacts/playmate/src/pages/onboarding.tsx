@@ -9,6 +9,7 @@ import {
   useCreateProfile 
 } from "@workspace/api-client-react";
 import { Phone, Shield, ArrowRight, CheckCircle2, Loader2, PlaySquare, MapPin } from "lucide-react";
+import { setSessionProfileId } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -81,7 +82,8 @@ export default function OnboardingPage() {
 
   const createProfile = useCreateProfile({
     mutation: {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        setSessionProfileId(data.id);
         setStep(3);
       },
       onError: (err: any) => {

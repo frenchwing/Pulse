@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { useListClubs, useSubmitClubInquiry, Club2 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Lock, Users, MapPin, ChevronDown, ChevronUp, Send } from "lucide-react";
@@ -169,7 +169,7 @@ const ALL_SPORTS = SPORT_LABELS.map(s => s.value);
 export default function ClubsPage() {
   const params = useParams<{ sport?: string }>();
   const [activeSport, setActiveSport] = useState<string>(params.sport ?? "all");
-  const [, setLocation] = useState("");
+  const [, setLocation] = useLocation();
 
   const { data: allClubs = [], isLoading } = useListClubs();
 

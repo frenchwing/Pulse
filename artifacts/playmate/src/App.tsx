@@ -13,6 +13,7 @@ import CreatePage from "@/pages/create";
 import ProfilePage from "@/pages/profile";
 import OnboardingPage from "@/pages/onboarding";
 import CorpsPage from "@/pages/corps";
+import VarsityPage from "@/pages/varsity";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,8 @@ function Router() {
         <Route path="/onboarding" component={OnboardingPage} />
         <Route path="/corps" component={CorpsPage} />
         <Route path="/corps/:sport" component={CorpsPage} />
+        <Route path="/varsity" component={VarsityPage} />
+        <Route path="/varsity/:sport" component={VarsityPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
