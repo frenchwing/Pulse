@@ -1,10 +1,5 @@
 import { useLocation, useParams } from "wouter";
-import { 
-  useGetProfile, 
-  useListCrews, 
-  useSubmitKyc,
-  getGetProfileQueryKey
-} from "@workspace/api-client-react";
+import { useGetProfile, useListCrews, useSubmitKyc, profileKey } from "@/hooks/use-firestore";
 import { useQueryClient } from "@tanstack/react-query";
 import { BadgeCheck, Flame, Star, Trophy, Target, ShieldCheck, MapPin, Users, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,7 +23,7 @@ const kycSchema = z.object({
 
 export default function ProfilePage() {
   const params = useParams();
-  const id = parseInt(params.id || "1", 10);
+  const id = params.id || "";
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -43,7 +38,7 @@ export default function ProfilePage() {
       onSuccess: () => {
         toast({ title: "Verification pending — review within 24 hours" });
         setKycOpen(false);
-        queryClient.invalidateQueries({ queryKey: getGetProfileQueryKey(id) });
+        queryClient.invalidateQueries({ queryKey: profileKey(String(id)) });
       },
       onError: (err: any) => {
         toast({ title: "Verification failed", description: err.message, variant: "destructive" });

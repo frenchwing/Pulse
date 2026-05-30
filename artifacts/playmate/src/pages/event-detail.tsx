@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useParams, Link } from "wouter";
 import {
-  useGetEvent, useJoinEvent, getGetEventQueryKey,
-  useGetEventRatings, useRateEventPlayer, getGetEventRatingsQueryKey,
-} from "@workspace/api-client-react";
+  useGetEvent, useJoinEvent, eventKey,
+  useGetEventRatings, useRateEventPlayer,
+} from "@/hooks/use-firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -39,23 +39,17 @@ function RatingBadge({ score }: { score: number }) {
 }
 
 export default function EventDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  const eventId = Number(id);
+  const { id: eventId } = useParams<{ id: string }>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: event, isLoading, isError } = useGetEvent(eventId, {
-    query: { enabled: !!eventId, queryKey: getGetEventQueryKey(eventId) }
-  });
-
-  const { data: ratings } = useGetEventRatings(eventId, {
-    query: { enabled: !!eventId, queryKey: getGetEventRatingsQueryKey(eventId) }
-  });
+  const { data: event, isLoading, isError } = useGetEvent(eventId);
+  const { data: ratings } = useGetEventRatings(eventId);
 
   const joinMutation = useJoinEvent({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetEventQueryKey(eventId) });
+        queryClient.invalidateQueries({ queryKey: eventKey(eventId) });
         toast({ title: "You're attending!", description: "Check your schedule and don't be late." });
         setHasJoined(true);
       },
@@ -68,7 +62,7 @@ export default function EventDetailPage() {
   const rateMutation = useRateEventPlayer({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetEventRatingsQueryKey(eventId) });
+        queryClient.invalidateQueries({ queryKey: ["eventRatings", eventId] });
         toast({ title: "Rating submitted!", description: FUNNY_LABELS[rateScore] });
         setRateStep("done");
       },

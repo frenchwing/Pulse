@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, lt, sql } from "drizzle-orm";
 import { db, activitiesTable } from "@workspace/db";
 
 const router = Router();
@@ -29,6 +29,7 @@ router.post("/activities", async (req, res) => {
   }
   const venueFee = body.venueFee ?? null;
   const maxPlayers = Number(body.maxPlayers);
+  if (!maxPlayers || maxPlayers < 1) { res.status(400).json({ error: "maxPlayers must be at least 1" }); return; }
   const estimatedCostPerPerson = body.estimatedCostPerPerson ?? (venueFee ? Math.round(venueFee / maxPlayers) : null);
   const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null;
   const [row] = await db.insert(activitiesTable).values({
@@ -74,18 +75,23 @@ router.delete("/activities/:id", async (req, res) => {
 router.post("/activities/:id/join", async (req, res) => {
   const id = Number(req.params.id);
   if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
-  const [existing] = await db.select().from(activitiesTable).where(eq(activitiesTable.id, id));
-  if (!existing) { res.status(404).json({ error: "Not found" }); return; }
-  if (existing.status === "full" || existing.currentPlayers >= existing.maxPlayers) {
+  const [row] = await db.update(activitiesTable)
+    .set({
+      currentPlayers: sql`${activitiesTable.currentPlayers} + 1`,
+      status: sql`CASE WHEN ${activitiesTable.currentPlayers} + 1 >= ${activitiesTable.maxPlayers} THEN 'full' ELSE 'open' END`,
+      estimatedCostPerPerson: sql`CASE WHEN ${activitiesTable.venueFee} IS NOT NULL THEN ROUND(${activitiesTable.venueFee}::numeric / (${activitiesTable.currentPlayers} + 1)) ELSE ${activitiesTable.estimatedCostPerPerson} END`,
+    })
+    .where(and(
+      eq(activitiesTable.id, id),
+      lt(activitiesTable.currentPlayers, activitiesTable.maxPlayers),
+      sql`${activitiesTable.status} != 'cancelled'`,
+    ))
+    .returning();
+  if (!row) {
+    const [check] = await db.select({ id: activitiesTable.id }).from(activitiesTable).where(eq(activitiesTable.id, id));
+    if (!check) { res.status(404).json({ error: "Not found" }); return; }
     res.status(400).json({ error: "Activity is full" }); return;
   }
-  const newCount = existing.currentPlayers + 1;
-  const newStatus = newCount >= existing.maxPlayers ? "full" : "open";
-  const venueFee = existing.venueFee;
-  const newCost = venueFee ? Math.round(venueFee / newCount) : existing.estimatedCostPerPerson;
-  const [row] = await db.update(activitiesTable)
-    .set({ currentPlayers: newCount, status: newStatus, estimatedCostPerPerson: newCost })
-    .where(eq(activitiesTable.id, id)).returning();
   res.json({ ...row, createdAt: row.createdAt.toISOString(), expiresAt: row.expiresAt?.toISOString() ?? null });
 });
 

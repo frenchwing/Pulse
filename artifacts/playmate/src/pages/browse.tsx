@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useListActivities, useListEvents, useGetSummaryStats } from "@workspace/api-client-react";
+import { useListActivities, useListEvents, useGetSummaryStats } from "@/hooks/use-firestore";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

@@ -3,7 +3,9 @@ import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useCreateActivity, useCreateEvent, getListActivitiesQueryKey, getListEventsQueryKey, ActivityInput, EventInput } from "@workspace/api-client-react";
+import { useCreateActivity, useCreateEvent, activitiesKey, eventsKey } from "@/hooks/use-firestore";
+type ActivityInput = any;
+type EventInput = any;
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,7 +58,7 @@ export default function CreatePage() {
   const createActivity = useCreateActivity({
     mutation: {
       onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: getListActivitiesQueryKey() });
+        queryClient.invalidateQueries({ queryKey: activitiesKey() });
         toast({ title: "Activity created successfully!" });
         setLocation(`/activity/${data.id}`);
       },
@@ -69,7 +71,7 @@ export default function CreatePage() {
   const createEvent = useCreateEvent({
     mutation: {
       onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: getListEventsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: eventsKey() });
         toast({ title: "Event created successfully!" });
         setLocation(`/event/${data.id}`);
       },

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useParams, Link } from "wouter";
 import {
-  useGetActivity, useJoinActivity, getGetActivityQueryKey,
-  useGetActivityRatings, useRateActivityPlayer, getGetActivityRatingsQueryKey,
-} from "@workspace/api-client-react";
+  useGetActivity, useJoinActivity, activityKey,
+  useGetActivityRatings, useRateActivityPlayer,
+} from "@/hooks/use-firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -39,23 +39,17 @@ function RatingBadge({ score }: { score: number }) {
 }
 
 export default function ActivityDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  const activityId = Number(id);
+  const { id: activityId } = useParams<{ id: string }>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: activity, isLoading, isError } = useGetActivity(activityId, {
-    query: { enabled: !!activityId, queryKey: getGetActivityQueryKey(activityId) }
-  });
-
-  const { data: ratings } = useGetActivityRatings(activityId, {
-    query: { enabled: !!activityId, queryKey: getGetActivityRatingsQueryKey(activityId) }
-  });
+  const { data: activity, isLoading, isError } = useGetActivity(activityId);
+  const { data: ratings } = useGetActivityRatings(activityId);
 
   const joinMutation = useJoinActivity({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetActivityQueryKey(activityId) });
+        queryClient.invalidateQueries({ queryKey: activityKey(activityId) });
         toast({ title: "You're in!", description: "Lace up and show up." });
         setHasJoined(true);
       },
@@ -68,7 +62,7 @@ export default function ActivityDetailPage() {
   const rateMutation = useRateActivityPlayer({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getGetActivityRatingsQueryKey(activityId) });
+        queryClient.invalidateQueries({ queryKey: ["activityRatings", activityId] });
         toast({ title: "Rating submitted!", description: FUNNY_LABELS[rateScore] });
         setRateStep("done");
       },

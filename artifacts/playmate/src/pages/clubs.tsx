@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useLocation } from "wouter";
-import { useListClubs, useSubmitClubInquiry, Club2 } from "@workspace/api-client-react";
+import { useListClubs, useSubmitClubInquiry } from "@/hooks/use-firestore";
+type Club2 = any;
 import { useQueryClient } from "@tanstack/react-query";
 import { Lock, Users, MapPin, ChevronDown, ChevronUp, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";

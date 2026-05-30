@@ -1,14 +1,10 @@
-const KEY = "pulse_profile_id";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
-export function getSessionProfileId(): number | null {
-  const v = localStorage.getItem(KEY);
-  return v ? Number(v) : null;
-}
-
-export function setSessionProfileId(id: number): void {
-  localStorage.setItem(KEY, String(id));
+export function getSessionProfileId(): string | null {
+  return auth.currentUser?.uid ?? null;
 }
 
 export function clearSession(): void {
-  localStorage.removeItem(KEY);
+  signOut(auth);
 }

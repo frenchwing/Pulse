@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useParams, useLocation } from "wouter";
-import {
-  useListClubs, useSubmitClubInquiry, useListCorpBattles, useCreateCorpBattle,
-  Club2, CorpBattle,
-} from "@workspace/api-client-react";
+import { useListClubs, useSubmitClubInquiry, useListCorpBattles, useCreateCorpBattle } from "@/hooks/use-firestore";
+type Club2 = any;
+type CorpBattle = any;
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Lock, Users, MapPin, ChevronDown, ChevronUp, Send,

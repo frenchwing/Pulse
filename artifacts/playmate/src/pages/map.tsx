@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { useListActivities, useListEvents, useListProfiles, Profile } from "@workspace/api-client-react";
+import { useListActivities, useListEvents, useListProfiles } from "@/hooks/use-firestore";
+type Profile = any;
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Users, Calendar, Clock, MapPin, User, Crosshair, Map as MapIcon, Radio, Zap } from "lucide-react";

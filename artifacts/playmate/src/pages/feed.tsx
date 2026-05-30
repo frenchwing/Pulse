@@ -1,15 +1,10 @@
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { format, formatDistanceToNow } from "date-fns";
-import { 
-  useListActivities, 
-  useListEvents, 
-  useJoinActivity,
-  getListActivitiesQueryKey,
-  Activity,
-  Event
-} from "@workspace/api-client-react";
+import { useListActivities, useListEvents, useJoinActivity, activitiesKey } from "@/hooks/use-firestore";
 import { useQueryClient } from "@tanstack/react-query";
+type Activity = any;
+type Event = any;
 import { Shield, MapPin, Clock, Users, ArrowRight } from "lucide-react";
 import { sportEmoji, sportColor, dopeLevel, ghostFactor, skillToDope } from "@/lib/sport-meta";
 import { Button } from "@/components/ui/button";
@@ -37,7 +32,7 @@ export default function FeedPage() {
     mutation: {
       onSuccess: () => {
         toast({ title: "Joined successfully!" });
-        queryClient.invalidateQueries({ queryKey: getListActivitiesQueryKey() });
+        queryClient.invalidateQueries({ queryKey: activitiesKey() });
       },
       onError: (error: any) => {
         toast({ title: "Failed to join", description: error.message, variant: "destructive" });

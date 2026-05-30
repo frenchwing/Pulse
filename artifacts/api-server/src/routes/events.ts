@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, lt, sql } from "drizzle-orm";
 import { db, eventsTable } from "@workspace/db";
 import {
   ListEventsQueryParams,
@@ -106,25 +106,23 @@ router.post("/events/:id/join", async (req, res) => {
     res.status(400).json({ error: "Invalid request" });
     return;
   }
-  const [existing] = await db
-    .select()
-    .from(eventsTable)
-    .where(eq(eventsTable.id, paramsParsed.data.id));
-  if (!existing) {
-    res.status(404).json({ error: "Not found" });
-    return;
-  }
-  if (existing.status === "full" || existing.currentAttendees >= existing.maxAttendees) {
-    res.status(400).json({ error: "Event is full" });
-    return;
-  }
-  const newCount = existing.currentAttendees + 1;
-  const newStatus = newCount >= existing.maxAttendees ? "full" : "open";
   const [row] = await db
     .update(eventsTable)
-    .set({ currentAttendees: newCount, status: newStatus })
-    .where(eq(eventsTable.id, paramsParsed.data.id))
+    .set({
+      currentAttendees: sql`${eventsTable.currentAttendees} + 1`,
+      status: sql`CASE WHEN ${eventsTable.currentAttendees} + 1 >= ${eventsTable.maxAttendees} THEN 'full' ELSE 'open' END`,
+    })
+    .where(and(
+      eq(eventsTable.id, paramsParsed.data.id),
+      lt(eventsTable.currentAttendees, eventsTable.maxAttendees),
+      sql`${eventsTable.status} != 'cancelled'`,
+    ))
     .returning();
+  if (!row) {
+    const [check] = await db.select({ id: eventsTable.id }).from(eventsTable).where(eq(eventsTable.id, paramsParsed.data.id));
+    if (!check) { res.status(404).json({ error: "Not found" }); return; }
+    res.status(400).json({ error: "Event is full" }); return;
+  }
   res.json({ ...row, createdAt: row.createdAt.toISOString() });
 });
 
