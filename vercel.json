@@ -1,0 +1,11 @@
+{
+  "buildCommand": "pnpm --filter @workspace/playmate build",
+  "outputDirectory": "artifacts/playmate/dist/public",
+  "installCommand": "pnpm install --ignore-scripts",
+  "framework": null,
+  "env": {
+    "BASE_PATH": "/",
+    "PORT": "3000",
+    "NODE_ENV": "production"
+  }
+}
