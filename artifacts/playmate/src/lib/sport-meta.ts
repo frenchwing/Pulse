@@ -78,9 +78,9 @@ export const DOPE_LEVELS: Record<number, { name: string; desc: string; emoji: st
   5:  { name: "Weekend Warrior",        desc: "Monday hero, Friday nobody",               emoji: "⚔️", color: "#eab308" },
   6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#a3e635" },
   7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#4ade80" },
-  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "👑", color: "#34d399" },
-  9:  { name: "Walking Highlight Reel", desc: "Illegal in 3 districts, allowed here",     emoji: "🎥", color: "#22d3ee" },
-  10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "🔥", color: "#00B4E0" },
+  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "🕶️", color: "#34d399" },
+  9:  { name: "Walking Highlight Reel", desc: "Only limited by his team",                 emoji: "🎥", color: "#22d3ee" },
+  10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "👽", color: "#00B4E0" },
 };
 
 export function dopeLevel(level: number) {
