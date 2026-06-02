@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Users, Calendar, Clock, MapPin, ArrowLeft, CheckCircle2, Shield } from "lucide-react";
+import { Loader2, Users, Calendar, Clock, MapPin, ArrowLeft, CheckCircle2, Shield, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
@@ -56,7 +56,7 @@ export default function EventDetailPage() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["eventRatings", eventId] });
-        toast({ title: "Rating submitted!", description: FUNNY_LABELS[rateScore] });
+        toast({ title: "Rating submitted!", description: dopeLevel(rateScore).name });
         setRateStep("done");
       },
       onError: (err: any) => {
@@ -242,7 +242,7 @@ export default function EventDetailPage() {
                       onChange={e => setRateScore(Number(e.target.value))}
                       className="w-full accent-primary"
                     />
-                    <p className="text-xs italic text-primary mt-1">{FUNNY_LABELS[rateScore]}</p>
+                    <p className="text-xs italic mt-1" style={{ color: dopeLevel(rateScore).color }}>{dopeLevel(rateScore).emoji} {dopeLevel(rateScore).name} — {dopeLevel(rateScore).desc}</p>
                   </div>
                   <Button
                     size="sm"

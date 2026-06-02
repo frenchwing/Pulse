@@ -40,7 +40,7 @@ export default function FeedPage() {
     }
   });
 
-  const handleJoin = (id: number) => {
+  const handleJoin = (id: string) => {
     const name = window.prompt("Enter your name to join:");
     if (name) {
       joinActivity.mutate({ id, data: { name } });

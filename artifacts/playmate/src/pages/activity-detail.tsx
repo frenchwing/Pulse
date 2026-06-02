@@ -56,7 +56,7 @@ export default function ActivityDetailPage() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["activityRatings", activityId] });
-        toast({ title: "Rating submitted!", description: FUNNY_LABELS[rateScore] });
+        toast({ title: "Rating submitted!", description: dopeLevel(rateScore).name });
         setRateStep("done");
       },
       onError: (err: any) => {
@@ -242,7 +242,7 @@ export default function ActivityDetailPage() {
                       onChange={e => setRateScore(Number(e.target.value))}
                       className="w-full accent-primary"
                     />
-                    <p className="text-xs italic text-primary mt-1">{FUNNY_LABELS[rateScore]}</p>
+                    <p className="text-xs italic mt-1" style={{ color: dopeLevel(rateScore).color }}>{dopeLevel(rateScore).emoji} {dopeLevel(rateScore).name} — {dopeLevel(rateScore).desc}</p>
                   </div>
                   <Button
                     size="sm"

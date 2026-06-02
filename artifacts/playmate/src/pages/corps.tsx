@@ -503,8 +503,8 @@ function CorpsList({ sport, onBack }: { sport: string; onBack: () => void }) {
   const { toast } = useToast();
   const [showBattleForm, setShowBattleForm] = useState(false);
 
-  const { data: allCorps = [], isLoading: corpsLoading } = useListClubs({ sport });
-  const { data: battles = [], isLoading: battlesLoading } = useListCorpBattles({ sport });
+  const { data: allCorps = [], isLoading: corpsLoading } = useListClubs(sport);
+  const { data: battles = [], isLoading: battlesLoading } = useListCorpBattles(sport);
 
   const hex = sportHex(sport);
 
