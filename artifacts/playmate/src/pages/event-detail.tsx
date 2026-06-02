@@ -7,34 +7,27 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Users, Calendar, Clock, MapPin, ArrowLeft, CheckCircle2, Star } from "lucide-react";
+import { Loader2, Users, Calendar, Clock, MapPin, ArrowLeft, CheckCircle2, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
+import { dopeLevel, DOPE_LEVELS } from "@/lib/sport-meta";
 
-const FUNNY_LABELS: Record<number, string> = {
-  1: "Barely touched the ball — we're concerned",
-  2: "Showed up. That's something, I guess",
-  3: "Watched way too many YouTube tutorials",
-  4: "Has potential. Deep, buried potential",
-  5: "Perfectly average. Neither threat nor joke",
-  6: "Solid. Won't embarrass you at a party",
-  7: "Actually kinda good. Suspicious.",
-  8: "Showoff. We hate-love this person",
-  9: "Future national team. We're not worthy",
-  10: "An absolute god. How are they even here?",
-};
-
-function RatingBadge({ score }: { score: number }) {
-  const color =
-    score <= 3 ? "text-red-400 border-red-400/30 bg-red-400/10" :
-    score <= 5 ? "text-orange-400 border-orange-400/30 bg-orange-400/10" :
-    score <= 7 ? "text-yellow-400 border-yellow-400/30 bg-yellow-400/10" :
-    "text-green-400 border-green-400/30 bg-green-400/10";
+function DopeBadge({ score }: { score: number }) {
+  const dl = dopeLevel(score);
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full border ${color}`}>
-      <Star className="w-3 h-3 fill-current" /> {score}/10
-    </span>
+    <div
+      className="flex items-center gap-2 px-3 py-1.5 rounded-xl border shrink-0"
+      style={{ borderColor: `${dl.color}40`, background: `${dl.color}12` }}
+    >
+      <span className="text-lg leading-none">{dl.emoji}</span>
+      <div className="flex flex-col leading-tight">
+        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: dl.color }}>
+          Dope Lv.{score}
+        </span>
+        <span className="text-[10px] text-muted-foreground">{dl.name}</span>
+      </div>
+    </div>
   );
 }
 
@@ -159,16 +152,13 @@ export default function EventDetailPage() {
             <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
               <h3 className="text-lg font-bold border-b border-border pb-2">Player Ratings</h3>
               {ratings.map(r => (
-                <div key={r.id} className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-sm font-semibold">
-                      <span className="text-muted-foreground">{r.fromName}</span>
-                      <span className="text-muted-foreground mx-2">rated</span>
-                      <span className="text-foreground">{r.toName}</span>
-                    </p>
-                    <p className="text-xs text-muted-foreground italic mt-0.5">{FUNNY_LABELS[r.score]}</p>
-                  </div>
-                  <RatingBadge score={r.score} />
+                <div key={r.id} className="flex items-center justify-between gap-4">
+                  <p className="text-sm font-semibold">
+                    <span className="text-muted-foreground">{r.fromName}</span>
+                    <span className="text-muted-foreground mx-2">rated</span>
+                    <span className="text-foreground">{r.toName}</span>
+                  </p>
+                  <DopeBadge score={r.score} />
                 </div>
               ))}
             </div>
@@ -270,6 +260,32 @@ export default function EventDetailPage() {
                 <p className="text-sm text-center text-green-500 font-medium">Rating submitted. They know.</p>
               )}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Dope Scale Legend */}
+      <div className="max-w-3xl mx-auto w-full px-4 md:px-8 pb-12 mt-8">
+        <div className="bg-card border border-border rounded-xl p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <Shield className="w-4 h-4 text-muted-foreground" />
+            <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground">The Dope Level Scale</h4>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {Object.entries(DOPE_LEVELS).map(([lvl, dl]) => (
+              <div
+                key={lvl}
+                className="rounded-xl p-3 flex flex-col items-center text-center gap-1 border"
+                style={{ borderColor: `${dl.color}30`, background: `${dl.color}08` }}
+              >
+                <span className="text-2xl">{dl.emoji}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: dl.color }}>
+                  Lv.{lvl}
+                </span>
+                <span className="text-[11px] font-bold text-foreground leading-tight">{dl.name}</span>
+                <span className="text-[10px] text-muted-foreground leading-tight">{dl.desc}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
