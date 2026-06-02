@@ -71,7 +71,7 @@ export function sportHex(type: string) {
 
 // Dope Levels 1-10 with funny descriptions
 export const DOPE_LEVELS: Record<number, { name: string; desc: string; emoji: string; color: string }> = {
-  1:  { name: "Just Showed Up",        desc: "Not sure which end to hold",               emoji: "🐣", color: "#ef4444" },
+  1:  { name: "Just Showed Up",        desc: "Has underdeveloped limbs",                 emoji: "🐣", color: "#ef4444" },
   2:  { name: "Getting Dressed",        desc: "Has the gear, skills still downloading",   emoji: "🌱", color: "#f87171" },
   3:  { name: "Has a Sports Bag",       desc: "Looks the part, that's about it",          emoji: "🎒", color: "#f97316" },
   4:  { name: "YouTube Certified",      desc: "Studied the move, never landed it",        emoji: "📱", color: "#fb923c" },
@@ -79,7 +79,7 @@ export const DOPE_LEVELS: Record<number, { name: string; desc: string; emoji: st
   6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#a3e635" },
   7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#4ade80" },
   8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "👑", color: "#34d399" },
-  9:  { name: "Walking Highlight Reel", desc: "Coaches come to watch, not play",          emoji: "🎥", color: "#22d3ee" },
+  9:  { name: "Walking Highlight Reel", desc: "Illegal in 3 districts, allowed here",     emoji: "🎥", color: "#22d3ee" },
   10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "🔥", color: "#00B4E0" },
 };
 
