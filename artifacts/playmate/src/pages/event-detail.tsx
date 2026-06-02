@@ -91,7 +91,7 @@ export default function EventDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center flex-1 space-y-4">
         <h2 className="text-2xl font-bold">Event not found</h2>
-        <Link href="/"><Button variant="outline">Back to Map</Button></Link>
+        <Link href="/map"><Button variant="outline">Back to Map</Button></Link>
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function EventDetailPage() {
 
   return (
     <div className="max-w-3xl mx-auto w-full p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <Link href="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6 transition-colors">
+      <Link href="/feed" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4 mr-2" /> Back to Map
       </Link>
 

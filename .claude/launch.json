@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "playmate",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/.bin/vite", "--host", "0.0.0.0"],
+      "port": 5173,
+      "cwd": "artifacts/playmate",
+      "env": {
+        "BASE_URL": "/"
+      }
+    }
+  ]
+}

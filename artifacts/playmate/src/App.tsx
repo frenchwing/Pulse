@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import { Layout } from "@/components/layout";
+import LandingPage from "@/pages/landing";
 import FeedPage from "@/pages/feed";
 import MapPage from "@/pages/map";
 import BrowsePage from "@/pages/browse";
@@ -22,7 +23,8 @@ function Router() {
   return (
     <Layout>
       <Switch>
-        <Route path="/" component={FeedPage} />
+        <Route path="/" component={LandingPage} />
+        <Route path="/feed" component={FeedPage} />
         <Route path="/map" component={MapPage} />
         <Route path="/browse" component={BrowsePage} />
         <Route path="/activity/:id" component={ActivityDetailPage} />

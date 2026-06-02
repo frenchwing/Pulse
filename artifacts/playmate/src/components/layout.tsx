@@ -24,7 +24,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <span className="font-bold text-xl text-primary tracking-tight">Pulse</span>
           </Link>
           <nav className="flex items-center space-x-1 flex-1 overflow-x-auto scrollbar-none">
-            {navItem("/", <Home className="w-4 h-4"/>, "Feed")}
+            {navItem("/feed", <Home className="w-4 h-4"/>, "Feed")}
             {navItem("/map", <Map className="w-4 h-4"/>, "Map")}
             {navItem("/browse", <List className="w-4 h-4"/>, "Browse")}
             {navItem("/corps", <Users className="w-4 h-4"/>, "Corps")}

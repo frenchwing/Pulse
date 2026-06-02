@@ -48,6 +48,9 @@ export default function OnboardingPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [selectedSports, setSelectedSports] = useState<{ sport: string; skill: string }[]>([]);
   const recaptchaRef = useRef<RecaptchaVerifier | null>(null);
+  // Stores the uid captured at sign-in time so onProfileSubmit doesn't
+  // depend on auth.currentUser which may not have propagated yet.
+  const signedInUidRef = useRef<string | null>(null);
 
   useEffect(() => {
     recaptchaRef.current = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
@@ -72,6 +75,7 @@ export default function OnboardingPage() {
       const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
       const uid = credential.user.uid;
+      signedInUidRef.current = uid;
       const existing = await getProfile(uid);
       if (existing) {
         toast({ title: "Welcome back!" });
@@ -106,6 +110,7 @@ export default function OnboardingPage() {
     try {
       const credential = await confirmationResult.confirm(values.code);
       const uid = credential.user.uid;
+      signedInUidRef.current = uid;
       const existing = await getProfileByPhone("+91" + phone.replace(/\s/g, ""));
       if (existing) {
         toast({ title: "Welcome back!" });
@@ -125,13 +130,21 @@ export default function OnboardingPage() {
       toast({ title: "Select at least one sport", variant: "destructive" });
       return;
     }
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
+    // Use the uid captured at sign-in time — auth.currentUser may not have
+    // propagated yet if onAuthStateChanged is still pending.
+    const uid = signedInUidRef.current ?? auth.currentUser?.uid;
+    if (!uid) {
+      toast({ title: "Session lost", description: "Please sign in again.", variant: "destructive" });
+      setStep(1);
+      return;
+    }
     setIsCreating(true);
     try {
+      // phone is only set during the OTP flow; Google users don't have one.
+      const phoneValue = phone ? "+91" + phone.replace(/\s/g, "") : null;
       await createProfile(uid, {
         name: values.name,
-        phone: "+91" + phone.replace(/\s/g, ""),
+        phone: phoneValue,
         gender: values.gender,
         womenOnlyPref: values.womenOnlyPref,
         locationArea: values.locationArea,

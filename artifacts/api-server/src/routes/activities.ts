@@ -6,6 +6,7 @@ const router = Router();
 
 router.get("/activities", async (req, res) => {
   const { type, status, skillLevel, genderPref, activityKind } = req.query as Record<string, string>;
+  const now = new Date();
   const rows = await db.select().from(activitiesTable)
     .where(sql`
       ${type ? sql`${activitiesTable.type} = ${type}` : sql`TRUE`}
@@ -13,6 +14,7 @@ router.get("/activities", async (req, res) => {
       AND ${skillLevel ? sql`${activitiesTable.skillLevel} = ${skillLevel}` : sql`TRUE`}
       AND ${genderPref ? sql`${activitiesTable.genderPref} = ${genderPref}` : sql`TRUE`}
       AND ${activityKind ? sql`${activitiesTable.activityKind} = ${activityKind}` : sql`TRUE`}
+      AND (${activitiesTable.expiresAt} IS NULL OR ${activitiesTable.expiresAt} > ${now})
     `)
     .orderBy(sql`${activitiesTable.createdAt} DESC`);
   res.json(rows.map(r => ({

@@ -189,7 +189,7 @@ export default function FeedPage() {
             <div className="flex flex-col">
               <span className="text-sm font-bold text-foreground">{item.hostName}</span>
               <div className="flex items-center gap-1.5">
-                <Badge variant="outline" className={`h-4 px-1 text-[10px] uppercase font-bold border-transparent ${scoreColor} text-white`}>
+                <Badge variant="outline" className={`h-4 px-1 text-[10px] uppercase font-bold border-transparent text-white ${hostScore >= 80 ? "bg-green-600" : hostScore >= 60 ? "bg-yellow-600" : "bg-red-600"}`}>
                   {hostScore} Rep
                 </Badge>
                 {cost > 0 && (
