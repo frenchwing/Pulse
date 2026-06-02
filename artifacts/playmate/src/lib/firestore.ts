@@ -192,6 +192,23 @@ export async function listClubs(sport?: string) {
   return items;
 }
 
+export async function createClub(data: any) {
+  const members: string[] = data.memberNames ?? [data.leaderName];
+  const ref = await addDoc(collection(db, "clubs"), {
+    ...data,
+    memberNames: members,
+    memberCount: members.length,
+    isExclusive: data.isExclusive ?? true,
+    city: "Ahmedabad",
+    reliabilityScore: 80,
+    avgDopeLevel: 5,
+    wins: 0,
+    losses: 0,
+    createdAt: serverTimestamp(),
+  });
+  return { id: ref.id, ...data, memberNames: members, memberCount: members.length, wins: 0, losses: 0 };
+}
+
 export async function submitClubInquiry(clubId: string, data: any) {
   const ref = await addDoc(collection(db, "clubs", clubId, "inquiries"), {
     ...data,

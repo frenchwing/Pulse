@@ -12,7 +12,10 @@
       "Bash(pnpm install *)",
       "mcp__Claude_Preview__preview_start",
       "Bash(Get-ChildItem C:\\\\Users\\\\Admin\\\\Pulse)",
-      "Bash(Select-Object Name, PSIsContainer)"
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }

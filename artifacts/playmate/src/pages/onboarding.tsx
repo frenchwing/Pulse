@@ -7,6 +7,8 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   GoogleAuthProvider,
   type ConfirmationResult,
 } from "firebase/auth";
@@ -57,6 +59,26 @@ export default function OnboardingPage() {
     return () => { recaptchaRef.current?.clear(); };
   }, []);
 
+  // Handle the result when Google redirect returns to this page
+  useEffect(() => {
+    getRedirectResult(auth).then(async (credential) => {
+      if (!credential) return;
+      const uid = credential.user.uid;
+      signedInUidRef.current = uid;
+      const existing = await getProfile(uid);
+      if (existing) {
+        toast({ title: "Welcome back!" });
+        setLocation("/");
+      } else {
+        setStep(2);
+      }
+    }).catch((err) => {
+      if (err.code !== "auth/null-user") {
+        toast({ title: "Google sign-in failed", description: err.message, variant: "destructive" });
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const phoneForm = useForm<z.infer<typeof phoneSchema>>({
     resolver: zodResolver(phoneSchema),
     defaultValues: { phone: "" },
@@ -71,8 +93,8 @@ export default function OnboardingPage() {
   });
 
   const onGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
     try {
-      const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
       const uid = credential.user.uid;
       signedInUidRef.current = uid;
@@ -84,6 +106,11 @@ export default function OnboardingPage() {
         setStep(2);
       }
     } catch (err: any) {
+      // Popup was blocked — fall back to full-page redirect
+      if (err.code === "auth/popup-blocked" || err.code === "auth/popup-closed-by-user") {
+        await signInWithRedirect(auth, provider);
+        return; // page will navigate away; getRedirectResult handles the return
+      }
       toast({ title: "Google sign-in failed", description: err.message, variant: "destructive" });
     }
   };

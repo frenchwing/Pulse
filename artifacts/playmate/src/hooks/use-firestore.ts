@@ -131,6 +131,15 @@ export function useListClubs(sport?: string) {
   return useQuery({ queryKey: ["clubs", sport], queryFn: () => fs.listClubs(sport) });
 }
 
+export function useCreateClub(options?: MutationOptions) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ data }: { data: any }) => fs.createClub(data),
+    onSuccess: (data) => { qc.invalidateQueries({ queryKey: ["clubs"] }); options?.mutation?.onSuccess?.(data); },
+    onError: options?.mutation?.onError,
+  });
+}
+
 export function useSubmitClubInquiry(options?: MutationOptions) {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) => fs.submitClubInquiry(id, data),

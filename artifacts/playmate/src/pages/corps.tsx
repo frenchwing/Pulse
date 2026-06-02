@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useParams, useLocation } from "wouter";
-import { useListClubs, useSubmitClubInquiry, useListCorpBattles, useCreateCorpBattle } from "@/hooks/use-firestore";
+import { useListClubs, useSubmitClubInquiry, useListCorpBattles, useCreateCorpBattle, useCreateClub } from "@/hooks/use-firestore";
 type Club2 = any;
 type CorpBattle = any;
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Lock, Users, MapPin, ChevronDown, ChevronUp, Send,
-  Swords, Trophy, ArrowLeft, Plus, Calendar, Shield,
+  Swords, Trophy, ArrowLeft, Plus, Calendar, Shield, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -336,6 +336,128 @@ function IssueBattleForm({ sport, corps, onClose }: { sport: string; corps: Club
   );
 }
 
+// ── Create Corp Form ──────────────────────────────────────────────────────────
+function CreateCorpForm({ onClose }: { onClose: () => void }) {
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const [name, setName] = useState("");
+  const [leaderName, setLeaderName] = useState("");
+  const [sport, setSport] = useState("");
+  const [tagline, setTagline] = useState("");
+  const [area, setArea] = useState("");
+  const [isExclusive, setIsExclusive] = useState(true);
+
+  const SPORTS = ["Football","Badminton","Cricket","Basketball","Tennis","Volleyball","Running","Cycling","Gym","Swimming","Pickleball","Throwball","Other"];
+
+  const createCorp = useCreateClub({
+    mutation: {
+      onSuccess: () => {
+        toast({ title: "⚔️ Corp founded!", description: `${name} is now on the map.` });
+        qc.invalidateQueries({ queryKey: ["clubs"] });
+        onClose();
+      },
+      onError: (e: any) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
+    },
+  });
+
+  const canSubmit = name.trim() && leaderName.trim() && sport;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        {/* Header */}
+        <div className="relative px-6 pt-8 pb-6 text-center border-b border-border"
+          style={{ background: "radial-gradient(ellipse at 50% 0%, #00B4E015, transparent 70%)" }}
+        >
+          <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+          <div className="text-5xl mb-3">⚔️</div>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight text-foreground leading-tight">
+            Start your own<br />
+            <span style={{
+              background: "linear-gradient(90deg, #00B4E0, #38bdf8)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>corp</span>
+          </h2>
+          <p className="text-muted-foreground text-sm mt-2">Build your squad. Dominate the city.</p>
+        </div>
+
+        {/* Form */}
+        <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Corp Name *</label>
+              <Input placeholder="e.g. Dark Knights FC" value={name} onChange={e => setName(e.target.value)} className="bg-background/60" />
+            </div>
+            <div className="col-span-2">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Your Name (Leader) *</label>
+              <Input placeholder="Your name" value={leaderName} onChange={e => setLeaderName(e.target.value)} className="bg-background/60" />
+            </div>
+            <div className="col-span-2">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Sport *</label>
+              <div className="flex flex-wrap gap-2">
+                {SPORTS.map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setSport(s.toLowerCase())}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${sport === s.toLowerCase() ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"}`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="col-span-2">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Tagline (optional)</label>
+              <Input placeholder="e.g. No mercy on the pitch" value={tagline} onChange={e => setTagline(e.target.value)} className="bg-background/60" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Area (optional)</label>
+              <Input placeholder="e.g. Navrangpura" value={area} onChange={e => setArea(e.target.value)} className="bg-background/60" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Membership</label>
+              <div className="flex rounded-lg overflow-hidden border border-border">
+                <button
+                  type="button"
+                  onClick={() => setIsExclusive(true)}
+                  className={`flex-1 py-2 text-xs font-bold transition-colors ${isExclusive ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}
+                >
+                  By invite
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsExclusive(false)}
+                  className={`flex-1 py-2 text-xs font-bold transition-colors ${!isExclusive ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}
+                >
+                  Open
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 pb-6">
+          <Button
+            className="w-full font-black text-base py-6 gap-2 text-primary-foreground"
+            style={{ background: "linear-gradient(135deg, #00B4E0, #0891b2)", boxShadow: "0 0 24px #00B4E030" }}
+            disabled={!canSubmit || createCorp.isPending}
+            onClick={() => createCorp.mutate({ data: { name, leaderName, sport, tagline: tagline || undefined, area: area || undefined, isExclusive } })}
+          >
+            <Swords className="w-5 h-5" />
+            {createCorp.isPending ? "Founding…" : "Found the Corp"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Sport Grid (landing) ──────────────────────────────────────────────────────
 function SportGrid({ sports, onSelect }: { sports: string[]; onSelect: (s: string) => void }) {
   return (
@@ -501,6 +623,7 @@ export default function CorpsPage() {
   const params = useParams<{ sport?: string }>();
   const [, setLocation] = useLocation();
   const [activeSport, setActiveSport] = useState<string | null>(params.sport ?? null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const { data: allCorps = [], isLoading } = useListClubs();
 
@@ -522,16 +645,27 @@ export default function CorpsPage() {
 
   return (
     <div className="flex-1 bg-background animate-in fade-in duration-400">
+      {showCreateForm && <CreateCorpForm onClose={() => setShowCreateForm(false)} />}
+
       {/* Hero */}
       <div className="bg-card border-b border-border pt-8 pb-7 px-4 md:px-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-end gap-3 mb-2">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-primary">The Corps</h1>
-            <span className="text-4xl mb-0.5">⚔️</span>
+        <div className="max-w-5xl mx-auto flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-end gap-3 mb-2">
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight text-primary">The Corps</h1>
+              <span className="text-4xl mb-0.5">⚔️</span>
+            </div>
+            <p className="text-muted-foreground text-base">
+              Elite sports crews of Ahmedabad. Pick your sport. Find your people.
+            </p>
           </div>
-          <p className="text-muted-foreground text-base">
-            Elite sports crews of Ahmedabad. Pick your sport. Find your people.
-          </p>
+          <Button
+            onClick={() => setShowCreateForm(true)}
+            className="gap-2 font-black text-sm px-5 py-5 text-primary-foreground shrink-0"
+            style={{ background: "linear-gradient(135deg, #00B4E0, #0891b2)", boxShadow: "0 0 20px #00B4E030" }}
+          >
+            <Plus className="w-4 h-4" /> Start a Corp
+          </Button>
         </div>
       </div>
 
@@ -546,7 +680,14 @@ export default function CorpsPage() {
           <div className="text-center py-20 text-muted-foreground">
             <div className="text-5xl mb-4">⚔️</div>
             <p className="text-lg font-bold text-foreground mb-2">No corps formed yet</p>
-            <p className="text-sm">Be the first to establish one.</p>
+            <p className="text-sm mb-6">Be the first to establish one.</p>
+            <Button
+              onClick={() => setShowCreateForm(true)}
+              className="gap-2 font-black px-6 py-5 text-primary-foreground"
+              style={{ background: "linear-gradient(135deg, #00B4E0, #0891b2)", boxShadow: "0 0 24px #00B4E030" }}
+            >
+              <Swords className="w-4 h-4" /> Found the First Corp
+            </Button>
           </div>
         ) : (
           <SportGrid sports={sportsWithCorps} onSelect={handleSelectSport} />
