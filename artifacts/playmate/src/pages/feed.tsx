@@ -189,9 +189,16 @@ export default function FeedPage() {
             <div className="flex flex-col">
               <span className="text-sm font-bold text-foreground">{item.hostName}</span>
               <div className="flex items-center gap-1.5">
-                <Badge variant="outline" className={`h-4 px-1 text-[10px] uppercase font-bold border-transparent text-white ${hostScore >= 80 ? "bg-green-600" : hostScore >= 60 ? "bg-yellow-600" : "bg-red-600"}`}>
-                  {hostScore} Rep
-                </Badge>
+                <span
+                  className="flex items-center gap-0.5 text-[11px] font-black px-1.5 py-0.5 rounded border"
+                  style={{ color: gf.color, borderColor: `${gf.color}40`, background: `${gf.color}15` }}
+                  title={`Bolt Index ${gf.score} — ${gf.label}: ${gf.desc}`}
+                >
+                  {Array.from({ length: gf.ghosts }).map((_, i) => (
+                    <span key={i}>⚡</span>
+                  ))}
+                  <span className="ml-0.5 uppercase tracking-wider">{gf.label}</span>
+                </span>
                 {cost > 0 && (
                   <Badge className="h-4 px-1 text-[10px] bg-primary/20 text-primary hover:bg-primary/30 border-transparent">
                     ~Rs.{Math.round(cost)}/person
