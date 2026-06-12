@@ -24,11 +24,27 @@ function toObj<T>(snap: any): T & { id: string } {
   return out;
 }
 
+// An item is expired when its explicit expiresAt has passed, or when its
+// start time is more than 2 hours in the past (grace period for games in progress).
+const EXPIRY_GRACE_MS = 2 * 60 * 60 * 1000;
+function isExpired(item: any): boolean {
+  const now = Date.now();
+  if (item.expiresAt) {
+    const t = new Date(item.expiresAt).getTime();
+    if (!isNaN(t) && t < now) return true;
+  }
+  if (item.date && item.time) {
+    const start = new Date(`${item.date}T${item.time}`).getTime();
+    if (!isNaN(start) && start + EXPIRY_GRACE_MS < now) return true;
+  }
+  return false;
+}
+
 // ── Activities ────────────────────────────────────────────────────────────────
 
 export async function listActivities(filters?: Record<string, string>) {
   const snap = await getDocs(query(collection(db, "activities"), orderBy("createdAt", "desc")));
-  let items = snap.docs.map(d => toObj<any>(d));
+  let items = snap.docs.map(d => toObj<any>(d)).filter(a => !isExpired(a));
   if (filters?.type) items = items.filter(a => a.type === filters.type);
   if (filters?.status) items = items.filter(a => a.status === filters.status);
   if (filters?.skillLevel) items = items.filter(a => a.skillLevel === filters.skillLevel);
@@ -95,7 +111,7 @@ export async function rateActivityPlayer(activityId: string, data: any) {
 
 export async function listEvents(filters?: Record<string, string>) {
   const snap = await getDocs(query(collection(db, "events"), orderBy("createdAt", "desc")));
-  let items = snap.docs.map(d => toObj<any>(d));
+  let items = snap.docs.map(d => toObj<any>(d)).filter(e => !isExpired(e));
   if (filters?.type) items = items.filter(e => e.type === filters.type);
   if (filters?.status) items = items.filter(e => e.status === filters.status);
   return items;
