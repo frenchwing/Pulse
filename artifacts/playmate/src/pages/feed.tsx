@@ -6,7 +6,7 @@ import { useSessionProfile } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
 type Activity = any;
 type Event = any;
-import { Shield, MapPin, Clock, Users, ArrowRight } from "lucide-react";
+import { Shield, MapPin, Clock, Users, ArrowRight, Zap } from "lucide-react";
 import { sportEmoji, sportColor, dopeLevel, ghostFactor, skillToDope } from "@/lib/sport-meta";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -238,10 +238,17 @@ export default function FeedPage() {
   return (
     <div className="flex-1 bg-background animate-in fade-in duration-500">
       {/* Header Section */}
-      <div className="bg-card border-b border-border pt-8 pb-6 px-4 md:px-8">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-primary mb-6">
-            What's Pulsing<br/>Near You
+      <div className="relative overflow-hidden bg-card border-b border-border pt-8 pb-6 px-4 md:px-8">
+        {/* Giant bolt watermark */}
+        <Zap
+          className="absolute pointer-events-none text-primary fill-primary opacity-[0.07]"
+          aria-hidden
+          style={{ width: 380, height: 380, right: "-2%", top: "-18%", transform: "rotate(14deg)" }}
+        />
+        <div className="max-w-4xl mx-auto relative">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-primary mb-6 flex items-start gap-2">
+            <span>What's Pulsing<br/>Near You</span>
+            <Zap className="w-9 h-9 md:w-11 md:h-11 text-primary fill-primary drop-shadow-[0_0_14px_rgba(0,180,224,0.8)] shrink-0 mt-1" />
           </h1>
           
           <div className="flex flex-wrap items-center gap-4 mb-6">

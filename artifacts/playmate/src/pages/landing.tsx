@@ -162,6 +162,15 @@ export default function LandingPage() {
           0%   { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+        @keyframes boltFlicker {
+          0%, 100% { opacity: 0.10; filter: drop-shadow(0 0 30px #00B4E060); }
+          8%        { opacity: 0.22; filter: drop-shadow(0 0 60px #00B4E0a0); }
+          12%       { opacity: 0.08; }
+          16%       { opacity: 0.18; filter: drop-shadow(0 0 50px #00B4E080); }
+          50%       { opacity: 0.10; }
+          54%       { opacity: 0.20; filter: drop-shadow(0 0 55px #00B4E090); }
+          58%       { opacity: 0.10; }
+        }
       `}</style>
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
@@ -181,6 +190,28 @@ export default function LandingPage() {
             style={{ animation: "scanLine 6s linear infinite", top: 0 }}
           />
         </div>
+
+        {/* Giant lightning bolts */}
+        <Zap
+          className="absolute pointer-events-none text-primary fill-primary"
+          aria-hidden
+          style={{
+            width: 420, height: 420,
+            left: "-4%", top: "8%",
+            transform: "rotate(-14deg)",
+            animation: "boltFlicker 7s ease-in-out infinite",
+          }}
+        />
+        <Zap
+          className="absolute pointer-events-none text-primary fill-primary"
+          aria-hidden
+          style={{
+            width: 340, height: 340,
+            right: "-3%", bottom: "6%",
+            transform: "rotate(12deg) scaleX(-1)",
+            animation: "boltFlicker 9s ease-in-out 2s infinite",
+          }}
+        />
 
         {/* Floating orbs */}
         {ORBS.map((orb, i) => (
