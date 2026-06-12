@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { useListActivities, useListEvents } from "@/hooks/use-firestore";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
+import { Bolt } from "@/components/bolt";
 import { SPORT_HEX } from "@/lib/sport-meta";
 
 // ── Floating orb data ─────────────────────────────────────────────────────────
@@ -163,13 +164,16 @@ export default function LandingPage() {
           100% { transform: translateX(-50%); }
         }
         @keyframes boltFlicker {
-          0%, 100% { opacity: 0.10; filter: drop-shadow(0 0 30px #00B4E060); }
-          8%        { opacity: 0.22; filter: drop-shadow(0 0 60px #00B4E0a0); }
-          12%       { opacity: 0.08; }
-          16%       { opacity: 0.18; filter: drop-shadow(0 0 50px #00B4E080); }
-          50%       { opacity: 0.10; }
-          54%       { opacity: 0.20; filter: drop-shadow(0 0 55px #00B4E090); }
-          58%       { opacity: 0.10; }
+          0%, 100% { opacity: 0.12; filter: drop-shadow(0 0 24px #00B4E070); }
+          6%        { opacity: 0.38; filter: drop-shadow(0 0 80px #00B4E0) brightness(1.6); }
+          7%        { opacity: 0.06; }
+          9%        { opacity: 0.34; filter: drop-shadow(0 0 70px #00B4E0e0) brightness(1.5); }
+          11%       { opacity: 0.12; }
+          47%       { opacity: 0.12; }
+          49%       { opacity: 0.30; filter: drop-shadow(0 0 60px #00B4E0c0) brightness(1.4); }
+          50%       { opacity: 0.08; }
+          52%       { opacity: 0.26; filter: drop-shadow(0 0 55px #00B4E0b0); }
+          55%       { opacity: 0.12; }
         }
       `}</style>
 
@@ -191,25 +195,23 @@ export default function LandingPage() {
           />
         </div>
 
-        {/* Giant lightning bolts */}
-        <Zap
-          className="absolute pointer-events-none text-primary fill-primary"
-          aria-hidden
+        {/* Giant lightning bolts — jagged, strobing */}
+        <Bolt
+          className="absolute pointer-events-none text-primary"
           style={{
-            width: 420, height: 420,
-            left: "-4%", top: "8%",
-            transform: "rotate(-14deg)",
-            animation: "boltFlicker 7s ease-in-out infinite",
+            width: 300, height: 600,
+            left: "-3%", top: "-4%",
+            transform: "rotate(-18deg) skewX(-6deg)",
+            animation: "boltFlicker 6s linear infinite",
           }}
         />
-        <Zap
-          className="absolute pointer-events-none text-primary fill-primary"
-          aria-hidden
+        <Bolt
+          className="absolute pointer-events-none text-primary"
           style={{
-            width: 340, height: 340,
-            right: "-3%", bottom: "6%",
-            transform: "rotate(12deg) scaleX(-1)",
-            animation: "boltFlicker 9s ease-in-out 2s infinite",
+            width: 230, height: 460,
+            right: "-2%", bottom: "-8%",
+            transform: "rotate(16deg) scaleX(-1) skewX(-8deg)",
+            animation: "boltFlicker 8s linear 2.5s infinite",
           }}
         />
 

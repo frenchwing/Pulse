@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
-import { Plus, Map, List, Home, Users, GraduationCap, UserCircle, Zap } from "lucide-react";
+import { Plus, Map, List, Home, Users, GraduationCap, UserCircle } from "lucide-react";
+import { Bolt } from "@/components/bolt";
 import { Button } from "@/components/ui/button";
 import { getSessionProfileId } from "@/hooks/use-session";
 
@@ -21,7 +22,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 w-full border-b border-border bg-card/80 backdrop-blur">
         <div className="container flex h-14 items-center px-4 md:px-6">
           <Link href="/" className="mr-4 flex items-center gap-1.5 shrink-0">
-            <Zap className="w-6 h-6 text-primary fill-primary drop-shadow-[0_0_10px_rgba(0,180,224,0.9)]" />
+            <Bolt className="w-4 h-7 text-primary drop-shadow-[0_0_10px_rgba(0,180,224,0.9)] -skew-x-6" />
             <span className="font-bold text-xl text-primary tracking-tight">Pulse</span>
           </Link>
           <nav className="flex items-center space-x-1 flex-1 overflow-x-auto scrollbar-none">
