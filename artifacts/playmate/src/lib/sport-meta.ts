@@ -142,7 +142,8 @@ export function ghostFactor(reliabilityScore: number): GhostFactorInfo {
 }
 
 // Map skill level text → a specific dope level number (varies by seed so the feed shows many levels)
-export function skillToDope(skill: string, seed: number = 0): number {
+// Seed can be a Firestore string id or a number.
+export function skillToDope(skill: string, seed: number | string = 0): number {
   const ranges: Record<string, [number, number]> = {
     beginner:     [1, 3],
     intermediate: [4, 6],
@@ -150,7 +151,10 @@ export function skillToDope(skill: string, seed: number = 0): number {
     pro:          [9, 10],
   };
   const [min, max] = ranges[skill?.toLowerCase()] ?? [4, 6];
-  return min + (seed % (max - min + 1));
+  const n = typeof seed === "number"
+    ? seed
+    : String(seed).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  return min + (n % (max - min + 1));
 }
 
 export const SPORT_LABELS: { value: string; label: string }[] = [

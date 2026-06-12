@@ -4,7 +4,7 @@
     {
       "name": "playmate",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["node_modules/.bin/vite", "--host", "0.0.0.0"],
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--host", "0.0.0.0"],
       "port": 5173,
       "cwd": "artifacts/playmate",
       "env": {

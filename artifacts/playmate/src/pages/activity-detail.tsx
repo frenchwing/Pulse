@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, Link, useLocation } from "wouter";
+import { useSessionProfile } from "@/hooks/use-session";
 import {
   useGetActivity, useJoinActivity, activityKey,
   useGetActivityRatings, useRateActivityPlayer,
 } from "@/hooks/use-firestore";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Users, Calendar, Clock, MapPin, ArrowLeft, CheckCircle2, Star, Shield } from "lucide-react";
 import { dopeLevel, DOPE_LEVELS } from "@/lib/sport-meta";
@@ -35,6 +35,8 @@ export default function ActivityDetailPage() {
   const { id: activityId } = useParams<{ id: string }>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
+  const { uid, profile } = useSessionProfile();
 
   const { data: activity, isLoading, isError } = useGetActivity(activityId);
   const { data: ratings } = useGetActivityRatings(activityId);
@@ -65,11 +67,9 @@ export default function ActivityDetailPage() {
     }
   });
 
-  const [name, setName] = useState("");
   const [hasJoined, setHasJoined] = useState(false);
   const [rateStep, setRateStep] = useState<"idle" | "form" | "done">("idle");
   const [rateTo, setRateTo] = useState("");
-  const [rateFrom, setRateFrom] = useState("");
   const [rateScore, setRateScore] = useState(5);
 
   if (isLoading) {
@@ -94,6 +94,12 @@ export default function ActivityDetailPage() {
   const avgRating = ratings && ratings.length > 0
     ? (ratings.reduce((s, r) => s + r.score, 0) / ratings.length).toFixed(1)
     : null;
+
+  const participants: { profileId: string | null; name: string }[] = (activity as any).participants ?? [];
+  const alreadyJoined = hasJoined || (!!uid && participants.some(p => p.profileId === uid));
+  // You can only rate other tracked players, and only if you played
+  const rateablePlayers = participants.filter(p => p.profileId && p.profileId !== uid);
+  const canRate = alreadyJoined && !!profile && rateablePlayers.length > 0;
 
   return (
     <div className="max-w-3xl mx-auto w-full p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -180,7 +186,7 @@ export default function ActivityDetailPage() {
               </div>
             </div>
 
-            {hasJoined ? (
+            {alreadyJoined ? (
               <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center">
                 <CheckCircle2 className="w-8 h-8 text-green-500 mx-auto mb-2" />
                 <p className="font-bold text-green-500">You're in!</p>
@@ -190,49 +196,80 @@ export default function ActivityDetailPage() {
               <Button disabled className="w-full" size="lg" variant="secondary">Game is Full</Button>
             ) : !isOpen ? (
               <Button disabled className="w-full" size="lg" variant="secondary">Game Closed</Button>
-            ) : (
-              <div className="space-y-3">
-                <label className="text-sm font-medium block">Your Name</label>
-                <Input
-                  placeholder="Enter your name to join"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="bg-background/50 border-input"
-                />
+            ) : !uid || !profile ? (
+              <div className="space-y-2">
                 <Button
-                  className="w-full font-bold text-primary-foreground bg-primary hover:bg-primary/90 shadow-[0_0_20px_rgba(0,180,224,0.3)] transition-all hover:shadow-[0_0_30px_rgba(0,180,224,0.5)]"
+                  className="w-full font-bold text-primary-foreground bg-primary hover:bg-primary/90 shadow-[0_0_20px_rgba(0,180,224,0.3)]"
                   size="lg"
-                  disabled={!name.trim() || joinMutation.isPending}
-                  onClick={() => joinMutation.mutate({ id: activityId, data: { name } })}
+                  onClick={() => setLocation("/onboarding")}
                 >
-                  {joinMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Join Game
+                  Sign in to Join
                 </Button>
+                <p className="text-xs text-center text-muted-foreground">Joining is tied to your Pulse profile.</p>
+              </div>
+            ) : (
+              <Button
+                className="w-full font-bold text-primary-foreground bg-primary hover:bg-primary/90 shadow-[0_0_20px_rgba(0,180,224,0.3)] transition-all hover:shadow-[0_0_30px_rgba(0,180,224,0.5)]"
+                size="lg"
+                disabled={joinMutation.isPending}
+                onClick={() => joinMutation.mutate({ id: activityId, data: { profileId: uid, name: profile.name } })}
+              >
+                {joinMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Join as {profile.name}
+              </Button>
+            )}
+
+            {/* Who's playing */}
+            {participants.length > 0 && (
+              <div className="border-t border-border pt-4">
+                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Who's playing</p>
+                <div className="space-y-1.5">
+                  {participants.map((p, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm">
+                      <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-[10px] font-black text-secondary-foreground">
+                        {p.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className={p.profileId === uid ? "font-bold text-primary" : "text-foreground"}>
+                        {p.name}{p.profileId === uid ? " (you)" : ""}
+                      </span>
+                      {i === 0 && <span className="text-[10px] text-muted-foreground uppercase tracking-wider ml-auto">Host</span>}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
             <div className="border-t border-border pt-4">
               {rateStep === "idle" && (
-                <Button variant="outline" size="sm" className="w-full" onClick={() => setRateStep("form")}>
-                  <Star className="w-4 h-4 mr-2" /> Rate a player
-                </Button>
+                canRate ? (
+                  <Button variant="outline" size="sm" className="w-full" onClick={() => setRateStep("form")}>
+                    <Star className="w-4 h-4 mr-2" /> Rate a player
+                  </Button>
+                ) : (
+                  <p className="text-xs text-center text-muted-foreground">
+                    {!alreadyJoined ? "Join the game to rate players." : "No other tracked players to rate yet."}
+                  </p>
+                )
               )}
 
               {rateStep === "form" && (
                 <div className="space-y-3 animate-in fade-in duration-300">
                   <p className="text-sm font-bold text-foreground">Rate someone from this game</p>
-                  <Input
-                    placeholder="Your name"
-                    value={rateFrom}
-                    onChange={e => setRateFrom(e.target.value)}
-                    className="bg-background/50 text-sm"
-                  />
-                  <Input
-                    placeholder="Their name"
-                    value={rateTo}
-                    onChange={e => setRateTo(e.target.value)}
-                    className="bg-background/50 text-sm"
-                  />
+                  <div className="space-y-1.5">
+                    {rateablePlayers.map(p => (
+                      <button
+                        key={p.profileId}
+                        type="button"
+                        onClick={() => setRateTo(p.profileId!)}
+                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${rateTo === p.profileId ? "border-primary bg-primary/10 text-primary" : "border-border text-foreground hover:border-primary/40"}`}
+                      >
+                        <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-[10px] font-black">
+                          {p.name.charAt(0).toUpperCase()}
+                        </div>
+                        {p.name}
+                      </button>
+                    ))}
+                  </div>
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="text-xs text-muted-foreground">Score: {rateScore}/10</label>
@@ -247,8 +284,16 @@ export default function ActivityDetailPage() {
                   <Button
                     size="sm"
                     className="w-full bg-primary text-primary-foreground font-bold"
-                    disabled={!rateFrom.trim() || !rateTo.trim() || rateMutation.isPending}
-                    onClick={() => rateMutation.mutate({ id: activityId, data: { fromName: rateFrom, toName: rateTo, score: rateScore } })}
+                    disabled={!rateTo || rateMutation.isPending}
+                    onClick={() => {
+                      const target = rateablePlayers.find(p => p.profileId === rateTo);
+                      if (!target) return;
+                      rateMutation.mutate({ id: activityId, data: {
+                        fromProfileId: uid, fromName: profile.name,
+                        toProfileId: target.profileId, toName: target.name,
+                        score: rateScore,
+                      }});
+                    }}
                   >
                     {rateMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : null}
                     Submit Rating

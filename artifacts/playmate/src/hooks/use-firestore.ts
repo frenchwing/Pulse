@@ -32,7 +32,7 @@ export function useCreateActivity(options?: MutationOptions) {
 export function useJoinActivity(options?: MutationOptions) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id }: { id: string; data?: any }) => fs.joinActivity(id),
+    mutationFn: ({ id, data }: { id: string; data: { profileId: string; name: string } }) => fs.joinActivity(id, data),
     onSuccess: (data) => { qc.invalidateQueries({ queryKey: activitiesKey() }); options?.mutation?.onSuccess?.(data); },
     onError: options?.mutation?.onError,
   });
@@ -73,7 +73,7 @@ export function useCreateEvent(options?: MutationOptions) {
 export function useJoinEvent(options?: MutationOptions) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id }: { id: string; data?: any }) => fs.joinEvent(id),
+    mutationFn: ({ id, data }: { id: string; data: { profileId: string; name: string } }) => fs.joinEvent(id, data),
     onSuccess: (data) => { qc.invalidateQueries({ queryKey: eventsKey() }); options?.mutation?.onSuccess?.(data); },
     onError: options?.mutation?.onError,
   });

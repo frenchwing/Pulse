@@ -46,29 +46,35 @@ export async function createActivity(data: any) {
   const maxPlayers = Number(data.maxPlayers);
   const venueFee = data.venueFee ?? null;
   const estimatedCostPerPerson = venueFee && maxPlayers > 0 ? Math.round(venueFee / maxPlayers) : null;
+  // Host is the first participant
+  const participants = [{ profileId: data.hostProfileId ?? null, name: data.hostName }];
   const ref = await addDoc(collection(db, "activities"), {
     ...data,
     maxPlayers,
     currentPlayers: 1,
+    participants,
     estimatedCostPerPerson,
     status: "open",
     createdAt: serverTimestamp(),
   });
-  return { ...data, id: ref.id, maxPlayers, currentPlayers: 1, status: "open", estimatedCostPerPerson };
+  return { ...data, id: ref.id, maxPlayers, currentPlayers: 1, participants, status: "open", estimatedCostPerPerson };
 }
 
-export async function joinActivity(id: string) {
+export async function joinActivity(id: string, participant: { profileId: string; name: string }) {
   return runTransaction(db, async (tx) => {
     const ref = doc(db, "activities", id);
     const snap = await tx.get(ref);
     if (!snap.exists()) throw new Error("Not found");
     const d = snap.data();
+    const participants: any[] = d.participants ?? [];
+    if (participants.some(p => p.profileId === participant.profileId)) throw new Error("You've already joined this game");
     if (d.status === "full" || d.currentPlayers >= d.maxPlayers) throw new Error("Activity is full");
     const newCount = d.currentPlayers + 1;
     const newStatus = newCount >= d.maxPlayers ? "full" : "open";
     const newCost = d.venueFee ? Math.round(d.venueFee / newCount) : d.estimatedCostPerPerson;
-    tx.update(ref, { currentPlayers: newCount, status: newStatus, estimatedCostPerPerson: newCost });
-    return { ...d, id, currentPlayers: newCount, status: newStatus };
+    const newParticipants = [...participants, participant];
+    tx.update(ref, { currentPlayers: newCount, status: newStatus, estimatedCostPerPerson: newCost, participants: newParticipants });
+    return { ...d, id, currentPlayers: newCount, status: newStatus, participants: newParticipants };
   });
 }
 
@@ -101,26 +107,31 @@ export async function getEvent(id: string) {
 }
 
 export async function createEvent(data: any) {
+  const participants = [{ profileId: data.hostProfileId ?? null, name: data.hostName }];
   const ref = await addDoc(collection(db, "events"), {
     ...data,
     currentAttendees: 1,
+    participants,
     status: "open",
     createdAt: serverTimestamp(),
   });
-  return { ...data, id: ref.id, currentAttendees: 1, status: "open" };
+  return { ...data, id: ref.id, currentAttendees: 1, participants, status: "open" };
 }
 
-export async function joinEvent(id: string) {
+export async function joinEvent(id: string, participant: { profileId: string; name: string }) {
   return runTransaction(db, async (tx) => {
     const ref = doc(db, "events", id);
     const snap = await tx.get(ref);
     if (!snap.exists()) throw new Error("Not found");
     const d = snap.data();
+    const participants: any[] = d.participants ?? [];
+    if (participants.some(p => p.profileId === participant.profileId)) throw new Error("You're already attending this event");
     if (d.status === "full" || d.currentAttendees >= d.maxAttendees) throw new Error("Event is full");
     const newCount = d.currentAttendees + 1;
     const newStatus = newCount >= d.maxAttendees ? "full" : "open";
-    tx.update(ref, { currentAttendees: newCount, status: newStatus });
-    return { ...d, id, currentAttendees: newCount, status: newStatus };
+    const newParticipants = [...participants, participant];
+    tx.update(ref, { currentAttendees: newCount, status: newStatus, participants: newParticipants });
+    return { ...d, id, currentAttendees: newCount, status: newStatus, participants: newParticipants };
   });
 }
 

@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useSessionProfile } from "@/hooks/use-session";
 import { Loader2 } from "lucide-react";
 
 const getRandomAhmedabadLocation = () => {
@@ -54,6 +55,7 @@ export default function CreatePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [mode, setMode] = useState<"activity" | "event">("activity");
+  const { uid, profile } = useSessionProfile();
 
   const createActivity = useCreateActivity({
     mutation: {
@@ -95,10 +97,21 @@ export default function CreatePage() {
     }
   });
 
+  // Prefill host name from the signed-in profile
+  useEffect(() => {
+    if (profile?.name) {
+      activityForm.setValue("hostName", profile.name);
+      eventForm.setValue("hostName", profile.name);
+    }
+  }, [profile?.name]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const onSubmitActivity = (values: z.infer<typeof activitySchema>) => {
     const loc = getRandomAhmedabadLocation();
     const payload: ActivityInput = {
       ...values,
+      // Tie hosting to the signed-in profile so the host is a tracked participant
+      hostName: profile?.name ?? values.hostName,
+      hostProfileId: uid ?? null,
       latitude: loc.lat,
       longitude: loc.lng
     };
@@ -109,6 +122,8 @@ export default function CreatePage() {
     const loc = getRandomAhmedabadLocation();
     const payload: EventInput = {
       ...values,
+      hostName: profile?.name ?? values.hostName,
+      hostProfileId: uid ?? null,
       latitude: loc.lat,
       longitude: loc.lng
     };

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { format, formatDistanceToNow } from "date-fns";
 import { useListActivities, useListEvents, useJoinActivity, activitiesKey } from "@/hooks/use-firestore";
+import { useSessionProfile } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
 type Activity = any;
 type Event = any;
@@ -20,6 +21,7 @@ export default function FeedPage() {
   const [_, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { uid, profile } = useSessionProfile();
   
   const [filterType, setFilterType] = useState<string>("All");
   const [filterSkill, setFilterSkill] = useState<string>("All Skills");
@@ -41,10 +43,12 @@ export default function FeedPage() {
   });
 
   const handleJoin = (id: string) => {
-    const name = window.prompt("Enter your name to join:");
-    if (name) {
-      joinActivity.mutate({ id, data: { name } });
+    if (!uid || !profile) {
+      toast({ title: "Sign in to join", description: "Joining is tied to your Pulse profile." });
+      setLocation("/onboarding");
+      return;
     }
+    joinActivity.mutate({ id, data: { profileId: uid, name: profile.name } });
   };
 
   const isLoading = isLoadingActivities || isLoadingEvents;

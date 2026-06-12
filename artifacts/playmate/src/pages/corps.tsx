@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useSessionProfile } from "@/hooks/use-session";
 import {
   sportEmoji, sportHex, sportColor, dopeLevel, reliabilityBadge, memberLoyaltyColor, SPORT_LABELS, LOYALTY_TIERS,
 } from "@/lib/sport-meta";
@@ -36,9 +37,9 @@ function DopeBadge({ level }: { level: number }) {
 // ── Corp Card ─────────────────────────────────────────────────────────────────
 function CorpCard({ corp }: { corp: Club2 }) {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const { uid, profile } = useSessionProfile();
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
 
   const hex = sportHex(corp.sport);
@@ -49,7 +50,7 @@ function CorpCard({ corp }: { corp: Club2 }) {
     mutation: {
       onSuccess: () => {
         toast({ title: "Request sent!", description: `${corp.name} will review your application.` });
-        setOpen(false); setName(""); setPhone(""); setMessage("");
+        setOpen(false); setMessage("");
       },
       onError: (e: any) => toast({ title: "Failed", description: e.message, variant: "destructive" }),
     },
@@ -182,23 +183,38 @@ function CorpCard({ corp }: { corp: Club2 }) {
 
         {open && (
           <div className="space-y-2 animate-in slide-in-from-top-2 duration-200">
-            <p className="text-xs text-muted-foreground">Your request goes to the corp leader for review.</p>
-            <Input placeholder="Your name *" value={name} onChange={e => setName(e.target.value)} className="bg-background/60 text-sm h-8" />
-            <Input placeholder="Phone (optional)" value={phone} onChange={e => setPhone(e.target.value)} className="bg-background/60 text-sm h-8" />
-            <Textarea
-              placeholder="Why do you want to join? (optional)"
-              value={message} onChange={e => setMessage(e.target.value)}
-              className="bg-background/60 text-sm resize-none" rows={2}
-            />
-            <Button
-              size="sm" className="w-full font-bold gap-2 text-primary-foreground"
-              style={{ background: hex.accent, color: hex.dim }}
-              disabled={!name.trim() || inquire.isPending}
-              onClick={() => inquire.mutate({ id: corp.id, data: { applicantName: name, applicantPhone: phone || undefined, message: message || undefined } })}
-            >
-              <Send className="w-3 h-3" />
-              {inquire.isPending ? "Sending…" : "Send Request"}
-            </Button>
+            {!uid || !profile ? (
+              <>
+                <p className="text-xs text-muted-foreground">Sign in to apply — requests are tied to your Pulse profile.</p>
+                <Button
+                  size="sm" className="w-full font-bold gap-2"
+                  style={{ background: hex.accent, color: hex.dim }}
+                  onClick={() => setLocation("/onboarding")}
+                >
+                  Sign in to Apply
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className="text-xs text-muted-foreground">
+                  Applying as <span className="font-bold text-foreground">{profile.name}</span> — the corp leader will review your request.
+                </p>
+                <Textarea
+                  placeholder="Why do you want to join? (optional)"
+                  value={message} onChange={e => setMessage(e.target.value)}
+                  className="bg-background/60 text-sm resize-none" rows={2}
+                />
+                <Button
+                  size="sm" className="w-full font-bold gap-2 text-primary-foreground"
+                  style={{ background: hex.accent, color: hex.dim }}
+                  disabled={inquire.isPending}
+                  onClick={() => inquire.mutate({ id: corp.id, data: { applicantName: profile.name, applicantProfileId: uid, applicantPhone: profile.phone || undefined, message: message || undefined } })}
+                >
+                  <Send className="w-3 h-3" />
+                  {inquire.isPending ? "Sending…" : "Send Request"}
+                </Button>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -340,12 +356,14 @@ function IssueBattleForm({ sport, corps, onClose }: { sport: string; corps: Club
 function CreateCorpForm({ onClose }: { onClose: () => void }) {
   const { toast } = useToast();
   const qc = useQueryClient();
+  const [, setLocation] = useLocation();
+  const { uid, profile } = useSessionProfile();
   const [name, setName] = useState("");
-  const [leaderName, setLeaderName] = useState("");
   const [sport, setSport] = useState("");
   const [tagline, setTagline] = useState("");
   const [area, setArea] = useState("");
   const [isExclusive, setIsExclusive] = useState(true);
+  const leaderName = profile?.name ?? "";
 
   const SPORTS = ["Football","Badminton","Cricket","Basketball","Tennis","Volleyball","Running","Cycling","Gym","Swimming","Pickleball","Throwball","Other"];
 
@@ -360,7 +378,7 @@ function CreateCorpForm({ onClose }: { onClose: () => void }) {
     },
   });
 
-  const canSubmit = name.trim() && leaderName.trim() && sport;
+  const canSubmit = name.trim() && !!profile && sport;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
@@ -393,8 +411,23 @@ function CreateCorpForm({ onClose }: { onClose: () => void }) {
               <Input placeholder="e.g. Dark Knights FC" value={name} onChange={e => setName(e.target.value)} className="bg-background/60" />
             </div>
             <div className="col-span-2">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Your Name (Leader) *</label>
-              <Input placeholder="Your name" value={leaderName} onChange={e => setLeaderName(e.target.value)} className="bg-background/60" />
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Leader</label>
+              {profile ? (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background/60 text-sm">
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-black text-primary">
+                    {leaderName.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="font-bold text-foreground">{leaderName}</span>
+                  <span className="text-xs text-muted-foreground ml-auto">your profile</span>
+                </div>
+              ) : (
+                <Button
+                  type="button" variant="outline" size="sm" className="w-full"
+                  onClick={() => { onClose(); setLocation("/onboarding"); }}
+                >
+                  Sign in to found a corp
+                </Button>
+              )}
             </div>
             <div className="col-span-2">
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">Sport *</label>
@@ -447,7 +480,7 @@ function CreateCorpForm({ onClose }: { onClose: () => void }) {
             className="w-full font-black text-base py-6 gap-2 text-primary-foreground"
             style={{ background: "linear-gradient(135deg, #00B4E0, #0891b2)", boxShadow: "0 0 24px #00B4E030" }}
             disabled={!canSubmit || createCorp.isPending}
-            onClick={() => createCorp.mutate({ data: { name, leaderName, sport, tagline: tagline || undefined, area: area || undefined, isExclusive } })}
+            onClick={() => createCorp.mutate({ data: { name, leaderName, leaderProfileId: uid, sport, tagline: tagline || undefined, area: area || undefined, isExclusive } })}
           >
             <Swords className="w-5 h-5" />
             {createCorp.isPending ? "Founding…" : "Found the Corp"}
