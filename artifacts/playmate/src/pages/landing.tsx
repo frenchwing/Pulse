@@ -5,19 +5,21 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 import { Bolt } from "@/components/bolt";
 import { SPORT_HEX } from "@/lib/sport-meta";
+import { GiSoccerBall, GiShuttlecock, GiBasketballBall, GiTennisBall, GiCricketBat, GiVolleyballBall, GiBicycling, GiSwimming, GiWeightLiftingUp, GiRunningNinja } from "react-icons/gi";
+import type { IconType } from "react-icons";
 
 // ── Floating orb data ─────────────────────────────────────────────────────────
-const ORBS = [
-  { emoji: "⚽", sport: "football",   size: 56, x: 12,  y: 18,  dur: 18, delay: 0   },
-  { emoji: "🏸", sport: "badminton",  size: 44, x: 78,  y: 12,  dur: 22, delay: 3   },
-  { emoji: "🏀", sport: "basketball", size: 60, x: 88,  y: 55,  dur: 20, delay: 1.5 },
-  { emoji: "🎾", sport: "tennis",     size: 40, x: 65,  y: 80,  dur: 25, delay: 5   },
-  { emoji: "🏏", sport: "cricket",    size: 48, x: 25,  y: 72,  dur: 17, delay: 2   },
-  { emoji: "🏐", sport: "volleyball", size: 36, x: 48,  y: 8,   dur: 23, delay: 7   },
-  { emoji: "🚴", sport: "cycling",    size: 42, x: 5,   y: 48,  dur: 19, delay: 4   },
-  { emoji: "🏊", sport: "swimming",   size: 38, x: 92,  y: 28,  dur: 21, delay: 6   },
-  { emoji: "💪", sport: "gym",        size: 34, x: 38,  y: 90,  dur: 24, delay: 8   },
-  { emoji: "🏃", sport: "running",    size: 46, x: 55,  y: 42,  dur: 16, delay: 1   },
+const ORBS: { Icon: IconType; sport: string; size: number; x: number; y: number; dur: number; delay: number }[] = [
+  { Icon: GiSoccerBall,      sport: "football",   size: 56, x: 12,  y: 18,  dur: 18, delay: 0   },
+  { Icon: GiShuttlecock,     sport: "badminton",  size: 44, x: 78,  y: 12,  dur: 22, delay: 3   },
+  { Icon: GiBasketballBall,  sport: "basketball", size: 60, x: 88,  y: 55,  dur: 20, delay: 1.5 },
+  { Icon: GiTennisBall,      sport: "tennis",     size: 40, x: 65,  y: 80,  dur: 25, delay: 5   },
+  { Icon: GiCricketBat,      sport: "cricket",    size: 48, x: 25,  y: 72,  dur: 17, delay: 2   },
+  { Icon: GiVolleyballBall,  sport: "volleyball", size: 36, x: 48,  y: 8,   dur: 23, delay: 7   },
+  { Icon: GiBicycling,       sport: "cycling",    size: 42, x: 5,   y: 48,  dur: 19, delay: 4   },
+  { Icon: GiSwimming,        sport: "swimming",   size: 38, x: 92,  y: 28,  dur: 21, delay: 6   },
+  { Icon: GiWeightLiftingUp, sport: "gym",        size: 34, x: 38,  y: 90,  dur: 24, delay: 8   },
+  { Icon: GiRunningNinja,    sport: "running",    size: 46, x: 55,  y: 42,  dur: 16, delay: 1   },
 ];
 
 // ── Sport chips ───────────────────────────────────────────────────────────────
@@ -35,6 +37,7 @@ function FloatingOrb({
   mouseY: number;
 }) {
   const hex = SPORT_HEX[orb.sport] ?? { accent: "#00B4E0", glow: "#0891b2", dim: "#031a20" };
+  const { Icon } = orb;
 
   // Parallax: orbs nudge slightly toward the cursor
   const parallaxX = (mouseX - 50) * 0.06;
@@ -58,10 +61,16 @@ function FloatingOrb({
           background: `radial-gradient(circle at 35% 35%, ${hex.accent}30, ${hex.accent}08)`,
           border: `1.5px solid ${hex.accent}25`,
           boxShadow: `0 0 ${orb.size * 0.6}px ${hex.glow}20`,
-          fontSize: orb.size * 0.48,
         }}
       >
-        {orb.emoji}
+        <Icon
+          style={{
+            width: orb.size * 0.52,
+            height: orb.size * 0.52,
+            color: hex.accent,
+            filter: `drop-shadow(0 0 6px ${hex.glow}80)`,
+          }}
+        />
       </div>
     </div>
   );
