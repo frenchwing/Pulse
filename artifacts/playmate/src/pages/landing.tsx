@@ -143,6 +143,14 @@ export default function LandingPage() {
     setMouseY(((e.clientY - rect.top)  / rect.height) * 100);
   };
 
+  const [striking, setStriking] = useState(false);
+
+  const electricNavigate = (dest: string) => {
+    if (striking) return;
+    setStriking(true);
+    setTimeout(() => setLocation(dest), 750);
+  };
+
   const goToFeed = (sport?: string) => {
     setLocation(sport ? `/feed?type=${sport.toLowerCase()}` : "/feed");
   };
@@ -184,7 +192,93 @@ export default function LandingPage() {
           52%       { opacity: 0.26; filter: drop-shadow(0 0 55px #00B4E0b0); }
           55%       { opacity: 0.12; }
         }
+
+        /* ── Electric strike transition ── */
+        @keyframes elecCrawl {
+          0%   { opacity: 0; transform: scaleX(0) skewX(-12deg); }
+          30%  { opacity: 1; }
+          70%  { opacity: 1; transform: scaleX(1.05) skewX(-6deg); }
+          100% { opacity: 0; transform: scaleX(1.1) skewX(0deg); }
+        }
+        @keyframes elecBolt1 {
+          0%   { opacity: 0; transform: translateX(-60%) rotate(-18deg) scaleY(0.2); }
+          15%  { opacity: 1; transform: translateX(-50%) rotate(-18deg) scaleY(1); filter: drop-shadow(0 0 40px #00B4E0) brightness(2); }
+          45%  { opacity: 0.9; }
+          65%  { opacity: 1; filter: drop-shadow(0 0 80px #fff) brightness(3); }
+          80%  { opacity: 0; }
+          100% { opacity: 0; }
+        }
+        @keyframes elecBolt2 {
+          0%   { opacity: 0; transform: translateX(60%) rotate(14deg) scaleX(-1) scaleY(0.2); }
+          25%  { opacity: 1; transform: translateX(50%) rotate(14deg) scaleX(-1) scaleY(1); filter: drop-shadow(0 0 40px #00B4E0) brightness(2); }
+          55%  { opacity: 0.9; }
+          70%  { opacity: 1; filter: drop-shadow(0 0 80px #fff) brightness(3); }
+          85%  { opacity: 0; }
+          100% { opacity: 0; }
+        }
+        @keyframes elecGlow {
+          0%   { opacity: 0; }
+          20%  { opacity: 0.18; }
+          55%  { opacity: 0.35; }
+          70%  { opacity: 0.8; }
+          80%  { opacity: 1; }
+          90%  { opacity: 0.6; }
+          100% { opacity: 0; }
+        }
+        @keyframes elecFlash {
+          0%   { opacity: 0; }
+          65%  { opacity: 0; }
+          72%  { opacity: 0.95; }
+          78%  { opacity: 0.2; }
+          83%  { opacity: 0.85; }
+          90%  { opacity: 0; }
+          100% { opacity: 0; }
+        }
+        @keyframes elecLine {
+          0%   { transform: translateX(-100%); opacity: 0.7; }
+          100% { transform: translateX(100vw); opacity: 0; }
+        }
       `}</style>
+
+      {/* ── Electric strike overlay ── */}
+      {striking && (
+        <div className="fixed inset-0 z-[999] pointer-events-none overflow-hidden">
+          {/* ambient glow flood */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "radial-gradient(ellipse 80% 60% at 50% 50%, #00B4E0 0%, #0891b280 40%, transparent 75%)",
+            animation: "elecGlow 0.75s ease-in-out forwards",
+          }} />
+          {/* left bolt */}
+          <Bolt style={{
+            position: "absolute", width: 280, height: 560,
+            left: "5%", top: "-5%", color: "#00B4E0",
+            animation: "elecBolt1 0.75s ease-in-out forwards",
+          }} />
+          {/* right bolt */}
+          <Bolt style={{
+            position: "absolute", width: 220, height: 440,
+            right: "5%", bottom: "-5%", color: "#38bdf8",
+            animation: "elecBolt2 0.75s ease-in-out forwards",
+          }} />
+          {/* horizontal scan lines */}
+          {[12, 34, 58, 76].map((top, i) => (
+            <div key={i} style={{
+              position: "absolute", left: 0, right: 0,
+              top: `${top}%`, height: 2,
+              background: "linear-gradient(90deg, transparent, #00B4E0, #fff, #00B4E0, transparent)",
+              animation: `elecLine ${0.18 + i * 0.07}s ${0.1 + i * 0.08}s linear forwards`,
+              opacity: 0,
+            }} />
+          ))}
+          {/* white strike flash */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "white",
+            animation: "elecFlash 0.75s ease-in-out forwards",
+          }} />
+        </div>
+      )}
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section
@@ -302,11 +396,13 @@ export default function LandingPage() {
           >
             <Button
               size="lg"
-              onClick={() => goToFeed()}
+              onClick={() => electricNavigate("/feed")}
+              disabled={striking}
               className="gap-2 font-black text-base px-8 py-6 text-primary-foreground"
               style={{
                 background: "linear-gradient(135deg, #00B4E0, #0891b2)",
-                boxShadow: "0 0 32px #00B4E040",
+                boxShadow: striking ? "0 0 60px #00B4E0cc" : "0 0 32px #00B4E040",
+                transition: "box-shadow 0.15s",
               }}
             >
               Explore Games <ArrowRight className="w-5 h-5" />
@@ -314,9 +410,15 @@ export default function LandingPage() {
             <Button
               size="lg"
               variant="outline"
-              onClick={() => setLocation("/onboarding")}
+              onClick={() => electricNavigate("/onboarding")}
+              disabled={striking}
               className="gap-2 font-bold text-base px-8 py-6"
-              style={{ borderColor: "#00B4E040", color: "#00B4E0" }}
+              style={{
+                borderColor: striking ? "#00B4E0" : "#00B4E040",
+                color: "#00B4E0",
+                boxShadow: striking ? "0 0 40px #00B4E080" : "none",
+                transition: "box-shadow 0.15s, border-color 0.15s",
+              }}
             >
               <Zap className="w-4 h-4" /> Join Pulse
             </Button>
