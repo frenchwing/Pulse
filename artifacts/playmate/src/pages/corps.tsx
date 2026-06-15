@@ -837,10 +837,8 @@ export default function CorpsPage() {
             <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none mb-3">
               <span className="text-foreground block">The</span>
               <span style={{
-                background: "linear-gradient(135deg, #00B4E0 0%, #818cf8 60%, #6366f1 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                color: "#ffffff",
+                textShadow: "0 0 40px #00B4E0aa, 0 0 80px #00B4E050",
               }}>Corps.</span>
             </h1>
             <p className="text-muted-foreground text-base mb-4">
