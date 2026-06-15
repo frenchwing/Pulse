@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Users, Calendar, Clock, MapPin, Search } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
+import { Bolt } from "@/components/bolt";
 
 export default function BrowsePage() {
   const [filterType, setFilterType] = useState<"all" | "activities" | "events">("all");
@@ -44,36 +45,34 @@ export default function BrowsePage() {
 
   return (
     <div className="container max-w-6xl mx-auto p-4 md:p-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-        <div>
-          <h1 className="text-4xl font-black tracking-tight mb-2">Discover</h1>
-          <p className="text-muted-foreground">
-            {stats ? `Found ${stats.openActivities} open activities and ${stats.openEvents} events nearby.` : "Find pickup games and social events in your area."}
+      {/* Hero */}
+      <div className="relative overflow-hidden pt-10 pb-8 px-0 -mx-4 md:-mx-8 mb-8" style={{ background: "radial-gradient(ellipse 120% 100% at 50% 0%, #00B4E012 0%, #6366f108 40%, transparent 70%)" }}>
+        <Bolt style={{ position:"absolute", top:0, left:"-20px", width:220, height:440, color:"#00B4E0", opacity:0.07, transform:"rotate(-15deg)", pointerEvents:"none" }} />
+        <Bolt style={{ position:"absolute", top:0, right:"-20px", width:160, height:320, color:"#6366f1", opacity:0.06, transform:"rotate(16deg) scaleX(-1)", pointerEvents:"none" }} />
+        <div className="relative px-4 md:px-8">
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-3">
+            <span className="text-foreground block">Find</span>
+            <span style={{ color:"#ffffff", textShadow:"0 0 40px #00B4E0aa, 0 0 80px #00B4E050" }}>Your Game.</span>
+          </h1>
+          <p className="text-muted-foreground text-sm mb-5">
+            {stats
+              ? <><span className="text-foreground font-black">{stats.openActivities}</span> open activities · <span className="text-foreground font-black">{stats.openEvents}</span> events near you</>
+              : "Pickup games and social events in Ahmedabad."}
           </p>
-        </div>
-        
-        <div className="flex gap-2">
-          <Button 
-            variant={filterType === "all" ? "default" : "outline"} 
-            className={filterType === "all" ? "bg-primary text-primary-foreground font-bold" : ""}
-            onClick={() => setFilterType("all")}
-          >
-            All
-          </Button>
-          <Button 
-            variant={filterType === "activities" ? "default" : "outline"} 
-            className={filterType === "activities" ? "bg-primary text-primary-foreground font-bold" : ""}
-            onClick={() => setFilterType("activities")}
-          >
-            Sports
-          </Button>
-          <Button 
-            variant={filterType === "events" ? "default" : "outline"} 
-            className={filterType === "events" ? "bg-primary text-primary-foreground font-bold" : ""}
-            onClick={() => setFilterType("events")}
-          >
-            Social
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            {(["all", "activities", "events"] as const).map(f => (
+              <button
+                key={f}
+                onClick={() => setFilterType(f)}
+                className="rounded-full px-4 py-1.5 text-sm font-bold border transition-all"
+                style={filterType === f
+                  ? { background:"linear-gradient(135deg,#00B4E0,#6366f1)", color:"#fff", border:"none", boxShadow:"0 0 20px #00B4E040" }
+                  : { background:"transparent", borderColor:"#ffffff20", color:"#888" }}
+              >
+                {f === "all" ? "All" : f === "activities" ? "Sports" : "Social"}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

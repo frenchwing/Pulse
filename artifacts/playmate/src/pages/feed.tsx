@@ -239,17 +239,17 @@ export default function FeedPage() {
   return (
     <div className="flex-1 bg-background animate-in fade-in duration-500">
       {/* Header Section */}
-      <div className="relative overflow-hidden bg-card border-b border-border pt-8 pb-6 px-4 md:px-8">
-        {/* Giant bolt watermark */}
-        <Bolt
-          className="absolute pointer-events-none text-primary opacity-[0.08]"
-          style={{ width: 240, height: 480, right: "2%", top: "-60%", transform: "rotate(18deg) skewX(-6deg)" }}
-        />
+      <div className="relative overflow-hidden pt-10 pb-6 px-4 md:px-8" style={{ background: "radial-gradient(ellipse 120% 100% at 50% 0%, #00B4E012 0%, #6366f108 40%, transparent 70%)" }}>
+        <Bolt style={{ position:"absolute", top:0, left:"-20px", width:240, height:480, color:"#00B4E0", opacity:0.07, transform:"rotate(-15deg)", pointerEvents:"none" }} />
+        <Bolt style={{ position:"absolute", top:0, right:"-20px", width:180, height:360, color:"#6366f1", opacity:0.06, transform:"rotate(16deg) scaleX(-1)", pointerEvents:"none" }} />
         <div className="max-w-4xl mx-auto relative">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-primary mb-6 flex items-start gap-2.5">
-            <span>What's Pulsing<br/>Near You</span>
-            <Bolt className="w-7 h-12 md:w-8 md:h-14 text-primary drop-shadow-[0_0_14px_rgba(0,180,224,0.9)] shrink-0 -skew-x-6" />
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-4">
+            <span className="text-foreground block">What's</span>
+            <span style={{ color:"#ffffff", textShadow:"0 0 40px #00B4E0aa, 0 0 80px #00B4E050" }}>Pulsing.</span>
           </h1>
+          <p className="text-muted-foreground text-sm font-medium mb-5">
+            <span className="text-foreground font-black">{openGames}</span> games · <span className="text-foreground font-black">{openEvents}</span> events open right now
+          </p>
           
           <div className="flex flex-wrap items-center gap-4 mb-6">
             <div className="flex bg-secondary p-1 rounded-full">
