@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useListClubs, useSubmitClubInquiry, useListCorpBattles, useCreateCorpBattle, useCreateClub } from "@/hooks/use-firestore";
 type Club2 = any;
@@ -17,6 +17,95 @@ import { useSessionProfile } from "@/hooks/use-session";
 import {
   sportEmoji, sportHex, sportColor, dopeLevel, reliabilityBadge, memberLoyaltyColor, SPORT_LABELS, LOYALTY_TIERS,
 } from "@/lib/sport-meta";
+import { Bolt } from "@/components/bolt";
+
+// ── Corps clash intro ─────────────────────────────────────────────────────────
+function ClashIntro({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 1000);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return (
+    <>
+      <style>{`
+        @keyframes clashFromLeft {
+          0%   { transform: translateX(-150vw) rotate(-14deg); filter: drop-shadow(0 0 20px #00B4E080); }
+          62%  { transform: translateX(0)      rotate(-14deg); filter: drop-shadow(0 0 40px #00B4E0cc); opacity: 1; }
+          76%  { transform: translateX(0)      rotate(-14deg); filter: drop-shadow(0 0 110px #00B4E0) brightness(3.5); opacity: 1; }
+          100% { transform: translateX(0)      rotate(-14deg); opacity: 0; }
+        }
+        @keyframes clashFromRight {
+          0%   { transform: translateX(150vw) rotate(14deg) scaleX(-1); filter: drop-shadow(0 0 20px #f9731680); }
+          62%  { transform: translateX(0)     rotate(14deg) scaleX(-1); filter: drop-shadow(0 0 40px #f97316cc); opacity: 1; }
+          76%  { transform: translateX(0)     rotate(14deg) scaleX(-1); filter: drop-shadow(0 0 110px #f97316) brightness(3.5); opacity: 1; }
+          100% { transform: translateX(0)     rotate(14deg) scaleX(-1); opacity: 0; }
+        }
+        @keyframes shockRing {
+          0%   { transform: scale(0.1); opacity: 0.9; }
+          100% { transform: scale(7);   opacity: 0; }
+        }
+        @keyframes clashFlash {
+          0%, 68% { opacity: 0; }
+          76%     { opacity: 0.95; }
+          83%     { opacity: 0.08; }
+          90%     { opacity: 0.7; }
+          100%    { opacity: 0; }
+        }
+        @keyframes overlayOut {
+          0%, 78% { opacity: 1; }
+          100%    { opacity: 0; }
+        }
+      `}</style>
+
+      <div
+        className="fixed inset-0 z-[999] pointer-events-none overflow-hidden"
+        style={{ background: "#080c10", animation: "overlayOut 1s ease-in-out forwards" }}
+      >
+        {/* Cyan bolt — from left */}
+        <Bolt style={{
+          position: "absolute",
+          width: 210, height: 420,
+          left: "calc(50% - 105px)",
+          top:  "calc(50% - 210px)",
+          color: "#00B4E0",
+          animation: "clashFromLeft 1s cubic-bezier(0.35,0,0.55,1) forwards",
+        }} />
+
+        {/* Orange bolt — from right, mirrored */}
+        <Bolt style={{
+          position: "absolute",
+          width: 210, height: 420,
+          left: "calc(50% - 105px)",
+          top:  "calc(50% - 210px)",
+          color: "#f97316",
+          animation: "clashFromRight 1s cubic-bezier(0.35,0,0.55,1) forwards",
+        }} />
+
+        {/* Shockwave rings */}
+        {[0, 0.06, 0.12].map((delay, i) => (
+          <div key={i} style={{
+            position: "absolute",
+            left: "50%", top: "50%",
+            width: 64, height: 64,
+            marginLeft: -32, marginTop: -32,
+            borderRadius: "50%",
+            border: `${2.5 - i * 0.5}px solid ${i % 2 === 0 ? "#00B4E070" : "#f9731670"}`,
+            animation: `shockRing 0.65s ease-out ${0.62 + delay}s forwards`,
+            opacity: 0,
+          }} />
+        ))}
+
+        {/* Impact flash */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "radial-gradient(circle at 50% 50%, #ffffff 0%, #00B4E070 30%, #f9731650 65%, transparent 80%)",
+          animation: "clashFlash 1s ease-in-out forwards",
+        }} />
+      </div>
+    </>
+  );
+}
 
 // ── Dope Level Bar ────────────────────────────────────────────────────────────
 function DopeBadge({ level }: { level: number }) {
@@ -657,6 +746,7 @@ export default function CorpsPage() {
   const [, setLocation] = useLocation();
   const [activeSport, setActiveSport] = useState<string | null>(params.sport ?? null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [clashDone, setClashDone] = useState(false);
 
   const { data: allCorps = [], isLoading } = useListClubs();
 
@@ -677,7 +767,11 @@ export default function CorpsPage() {
   }
 
   return (
-    <div className="flex-1 bg-background animate-in fade-in duration-400">
+    <div
+      className="flex-1 bg-background"
+      style={{ opacity: clashDone ? 1 : 0, transition: clashDone ? "opacity 0.35s ease-in" : "none" }}
+    >
+      {!clashDone && <ClashIntro onDone={() => setClashDone(true)} />}
       {showCreateForm && <CreateCorpForm onClose={() => setShowCreateForm(false)} />}
 
       {/* Hero */}
