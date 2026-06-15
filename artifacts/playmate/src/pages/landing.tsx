@@ -144,11 +144,18 @@ export default function LandingPage() {
   };
 
   const [striking, setStriking] = useState(false);
+  const [joiningPulse, setJoiningPulse] = useState(false);
 
   const electricNavigate = (dest: string) => {
-    if (striking) return;
+    if (striking || joiningPulse) return;
     setStriking(true);
     setTimeout(() => setLocation(dest), 750);
+  };
+
+  const joinPulseNavigate = () => {
+    if (striking || joiningPulse) return;
+    setJoiningPulse(true);
+    setTimeout(() => setLocation("/onboarding"), 900);
   };
 
   const goToFeed = (sport?: string) => {
@@ -191,6 +198,29 @@ export default function LandingPage() {
           50%       { opacity: 0.08; }
           52%       { opacity: 0.26; filter: drop-shadow(0 0 55px #00B4E0b0); }
           55%       { opacity: 0.12; }
+        }
+
+        /* ── Tennis ball zoom transition (Join Pulse) ── */
+        @keyframes tennisZoom {
+          0%   { transform: scale(0.025) rotate(0deg);   filter: blur(0px)   drop-shadow(0 0 4px #a3e63580); opacity: 1; }
+          35%  { transform: scale(0.22)  rotate(40deg);  filter: blur(2px)   drop-shadow(0 0 28px #a3e635cc); opacity: 1; }
+          65%  { transform: scale(0.9)   rotate(85deg);  filter: blur(7px)   drop-shadow(0 0 70px #84cc16cc); opacity: 1; }
+          85%  { transform: scale(2.4)   rotate(115deg); filter: blur(16px)  drop-shadow(0 0 110px #84cc16); opacity: 0.85; }
+          100% { transform: scale(4.5)   rotate(135deg); filter: blur(28px);                                  opacity: 0; }
+        }
+        @keyframes joinBoltIn {
+          0%    { opacity: 0; transform: translateX(-50%) translateY(-55%) scaleY(0.25); }
+          20%   { opacity: 1; transform: translateX(-50%) translateY(0%)   scaleY(1);    filter: drop-shadow(0 0 60px #00B4E0) brightness(2.5); }
+          55%   { opacity: 1; filter: drop-shadow(0 0 110px #ffffff) brightness(4.5); }
+          80%   { opacity: 0.7; }
+          100%  { opacity: 0; }
+        }
+        @keyframes joinFlash {
+          0%, 60% { opacity: 0; }
+          70%     { opacity: 0.95; }
+          78%     { opacity: 0.15; }
+          84%     { opacity: 0.85; }
+          100%    { opacity: 0; }
         }
 
         /* ── Electric strike transition ── */
@@ -239,6 +269,29 @@ export default function LandingPage() {
           100% { transform: translateX(100vw); opacity: 0; }
         }
       `}</style>
+
+      {/* ── Tennis ball + bolt overlay (Join Pulse) ── */}
+      {joiningPulse && (
+        <div className="fixed inset-0 z-[999] pointer-events-none overflow-hidden flex items-center justify-center">
+          <GiTennisBall style={{
+            position: "absolute", fontSize: 140, color: "#a3e635",
+            animation: "tennisZoom 0.9s cubic-bezier(0.2,0,1,1) forwards",
+            zIndex: 1,
+          }} />
+          <Bolt style={{
+            position: "absolute", width: 320, height: 640,
+            top: 0, left: "50%", color: "#00B4E0",
+            animation: "joinBoltIn 0.9s ease-in forwards",
+            animationDelay: "0.32s",
+            opacity: 0, zIndex: 2,
+          }} />
+          <div style={{
+            position: "absolute", inset: 0, background: "white",
+            animation: "joinFlash 0.9s ease-in-out forwards",
+            zIndex: 3,
+          }} />
+        </div>
+      )}
 
       {/* ── Electric strike overlay ── */}
       {striking && (
@@ -410,14 +463,14 @@ export default function LandingPage() {
             <Button
               size="lg"
               variant="outline"
-              onClick={() => electricNavigate("/onboarding")}
-              disabled={striking}
+              onClick={joinPulseNavigate}
+              disabled={joiningPulse || striking}
               className="gap-2 font-bold text-base px-8 py-6"
               style={{
-                borderColor: striking ? "#00B4E0" : "#00B4E040",
-                color: "#00B4E0",
-                boxShadow: striking ? "0 0 40px #00B4E080" : "none",
-                transition: "box-shadow 0.15s, border-color 0.15s",
+                borderColor: joiningPulse ? "#a3e635" : "#00B4E040",
+                color: joiningPulse ? "#a3e635" : "#00B4E0",
+                boxShadow: joiningPulse ? "0 0 40px #a3e63560" : "none",
+                transition: "box-shadow 0.15s, border-color 0.15s, color 0.15s",
               }}
             >
               <Zap className="w-4 h-4" /> Join Pulse
