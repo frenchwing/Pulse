@@ -767,11 +767,12 @@ export default function CorpsPage() {
   }
 
   return (
-    <div
-      className="flex-1 bg-background"
-      style={{ opacity: clashDone ? 1 : 0, transition: clashDone ? "opacity 0.35s ease-in" : "none" }}
-    >
+    <div className="flex-1 flex flex-col bg-background">
       {!clashDone && <ClashIntro onDone={() => setClashDone(true)} />}
+      <div
+        className="flex-1 flex flex-col"
+        style={{ opacity: clashDone ? 1 : 0, transition: clashDone ? "opacity 0.35s ease-in" : "none" }}
+      >
       {showCreateForm && <CreateCorpForm onClose={() => setShowCreateForm(false)} />}
 
       {/* Hero */}
@@ -819,6 +820,7 @@ export default function CorpsPage() {
         ) : (
           <SportGrid sports={sportsWithCorps} onSelect={handleSelectSport} />
         )}
+      </div>
       </div>
     </div>
   );
