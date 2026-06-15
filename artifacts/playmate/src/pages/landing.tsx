@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap } from "lucide-react";
 import { Bolt } from "@/components/bolt";
 import { SPORT_HEX } from "@/lib/sport-meta";
-import { GiSoccerBall, GiShuttlecock, GiBasketballBall, GiTennisBall, GiCricketBat, GiVolleyballBall, GiBicycling, GiSwimming, GiWeightLiftingUp, GiRunningNinja } from "react-icons/gi";
+import { GiSoccerBall, GiShuttlecock, GiBasketballBall, GiTennisBall, GiCricketBat, GiVolleyballBall, GiCycling, GiPoolDive, GiWeightLiftingUp, GiRunningNinja } from "react-icons/gi";
 import type { IconType } from "react-icons";
 
 // ── Floating orb data ─────────────────────────────────────────────────────────
@@ -16,8 +16,8 @@ const ORBS: { Icon: IconType; sport: string; size: number; x: number; y: number;
   { Icon: GiTennisBall,      sport: "tennis",     size: 40, x: 65,  y: 80,  dur: 25, delay: 5   },
   { Icon: GiCricketBat,      sport: "cricket",    size: 48, x: 25,  y: 72,  dur: 17, delay: 2   },
   { Icon: GiVolleyballBall,  sport: "volleyball", size: 36, x: 48,  y: 8,   dur: 23, delay: 7   },
-  { Icon: GiBicycling,       sport: "cycling",    size: 42, x: 5,   y: 48,  dur: 19, delay: 4   },
-  { Icon: GiSwimming,        sport: "swimming",   size: 38, x: 92,  y: 28,  dur: 21, delay: 6   },
+  { Icon: GiCycling,         sport: "cycling",    size: 42, x: 5,   y: 48,  dur: 19, delay: 4   },
+  { Icon: GiPoolDive,        sport: "swimming",   size: 38, x: 92,  y: 28,  dur: 21, delay: 6   },
   { Icon: GiWeightLiftingUp, sport: "gym",        size: 34, x: 38,  y: 90,  dur: 24, delay: 8   },
   { Icon: GiRunningNinja,    sport: "running",    size: 46, x: 55,  y: 42,  dur: 16, delay: 1   },
 ];
