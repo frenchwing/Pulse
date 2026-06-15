@@ -78,7 +78,7 @@ function ClashIntro({ onDone }: { onDone: () => void }) {
           width: 210, height: 420,
           left: "calc(50% - 105px)",
           top:  "calc(50% - 210px)",
-          color: "#f97316",
+          color: "#6366f1",
           animation: "clashFromRight 1s cubic-bezier(0.35,0,0.55,1) forwards",
         }} />
 
@@ -808,7 +808,7 @@ export default function CorpsPage() {
         style={{
           position: "relative",
           overflow: "hidden",
-          background: "radial-gradient(ellipse 120% 100% at 50% 0%, #f9731612 0%, #00B4E00a 40%, transparent 70%)",
+          background: "radial-gradient(ellipse 120% 100% at 50% 0%, #6366f108 0%, #00B4E00a 40%, transparent 70%)",
         }}
       >
         {/* Cyan bolt watermark — top-left */}
@@ -826,7 +826,7 @@ export default function CorpsPage() {
           position: "absolute",
           top: 0, right: "-20px",
           width: 180, height: 360,
-          color: "#f97316",
+          color: "#6366f1",
           opacity: 0.06,
           transform: "rotate(16deg) scaleX(-1)",
           pointerEvents: "none",
@@ -837,7 +837,7 @@ export default function CorpsPage() {
             <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none mb-3">
               <span className="text-foreground block">The</span>
               <span style={{
-                background: "linear-gradient(135deg, #f97316 0%, #ea580c 50%, #00B4E0 100%)",
+                background: "linear-gradient(135deg, #00B4E0 0%, #818cf8 60%, #6366f1 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -856,7 +856,7 @@ export default function CorpsPage() {
               </span>
               <span
                 className="rounded-full px-3 py-1 text-xs font-bold border"
-                style={{ borderColor: "#f9731640", color: "#f97316", background: "#f9731610", boxShadow: "0 0 10px #f9731620" }}
+                style={{ borderColor: "#6366f140", color: "#818cf8", background: "#6366f110", boxShadow: "0 0 10px #6366f120" }}
               >
                 {sportsWithCorps.length} Sports
               </span>
@@ -866,8 +866,8 @@ export default function CorpsPage() {
             onClick={() => setShowCreateForm(true)}
             className="gap-2 font-black text-base text-white shrink-0"
             style={{
-              background: "linear-gradient(135deg, #f97316, #ea580c)",
-              boxShadow: "0 0 30px #f9731640",
+              background: "linear-gradient(135deg, #00B4E0, #6366f1)",
+              boxShadow: "0 0 30px #00B4E040",
               padding: "24px 32px",
             }}
           >
@@ -892,8 +892,8 @@ export default function CorpsPage() {
               onClick={() => setShowCreateForm(true)}
               className="gap-2 font-black text-base text-white"
               style={{
-                background: "linear-gradient(135deg, #f97316, #ea580c)",
-                boxShadow: "0 0 30px #f9731640",
+                background: "linear-gradient(135deg, #00B4E0, #6366f1)",
+                boxShadow: "0 0 30px #00B4E040",
                 padding: "20px 36px",
               }}
             >
