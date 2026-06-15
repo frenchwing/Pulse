@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import {
   GraduationCap, ArrowLeft, Trophy, Swords, Users, Shield,
@@ -11,6 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { sportEmoji, sportHex, dopeLevel, SPORT_LABELS } from "@/lib/sport-meta";
+import { Bolt } from "@/components/bolt";
+import { GiSoccerBall, GiShuttlecock, GiBasketballBall, GiTennisBall, GiCricketBat, GiVolleyballBall, GiCycling, GiPoolDive, GiWeightLiftingUp, GiRunningNinja } from "react-icons/gi";
+import type { IconType } from "react-icons";
 
 // ── Static university data ─────────────────────────────────────────────────────
 
@@ -176,6 +179,19 @@ const VARSITY_CLASHES: VarsityClash[] = [
   { id: 9,  sport: "cricket",    uni1Id: 7, uni2Id: 6, uni1Score: null, uni2Score: null, result: "pending", date: "2026-06-05", venue: "GU Ground"         },
   { id: 10, sport: "football",   uni1Id: 1, uni2Id: 5, uni1Score: 2,    uni2Score: 2,    result: "draw",    date: "2026-05-25", venue: "IITGN Ground"      },
 ];
+
+const SPORT_ICONS: Record<string, IconType> = {
+  cricket:    GiCricketBat,
+  football:   GiSoccerBall,
+  badminton:  GiShuttlecock,
+  basketball: GiBasketballBall,
+  tennis:     GiTennisBall,
+  volleyball: GiVolleyballBall,
+  cycling:    GiCycling,
+  swimming:   GiPoolDive,
+  gym:        GiWeightLiftingUp,
+  running:    GiRunningNinja,
+};
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -667,6 +683,66 @@ function SportView({ sport, onBack }: { sport: string; onBack: () => void }) {
   );
 }
 
+// ── Sport throw overlay ────────────────────────────────────────────────────────
+
+function SportThrowOverlay({ sport, onDone }: { sport: string; onDone: () => void }) {
+  const hex = sportHex(sport);
+  const Icon = SPORT_ICONS[sport];
+
+  useEffect(() => {
+    const t = setTimeout(onDone, 780);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return (
+    <>
+      <style>{`
+        @keyframes sportBallThrow {
+          0%   { transform: scale(0.03); opacity: 0; }
+          15%  { opacity: 1; }
+          65%  { transform: scale(4); filter: blur(0px); }
+          100% { transform: scale(10); opacity: 0; filter: blur(30px); }
+        }
+        @keyframes sportThrowFlash {
+          0%,75% { opacity: 0; }
+          82%    { opacity: 0.9; }
+          92%    { opacity: 0.9; }
+          100%   { opacity: 0; }
+        }
+        @keyframes sportOverlayOut {
+          0%,80% { opacity: 1; }
+          100%   { opacity: 0; }
+        }
+      `}</style>
+      <div
+        className="fixed inset-0 z-[9999] flex items-center justify-center"
+        style={{ background: "#060a0f", animation: "sportOverlayOut 0.78s ease-in forwards" }}
+      >
+        {Icon ? (
+          <Icon style={{
+            width: 120, height: 120,
+            color: hex.accent,
+            filter: `drop-shadow(0 0 40px ${hex.accent}) drop-shadow(0 0 80px ${hex.glow})`,
+            animation: "sportBallThrow 0.78s ease-in forwards",
+          }} />
+        ) : (
+          <div style={{
+            fontSize: 100,
+            animation: "sportBallThrow 0.78s ease-in forwards",
+          }}>
+            {sportEmoji(sport)}
+          </div>
+        )}
+        {/* Flash */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "#ffffff", animation: "sportThrowFlash 0.78s ease-in forwards", pointerEvents: "none" }}
+        />
+      </div>
+    </>
+  );
+}
+
 // ── Sport grid (landing) ───────────────────────────────────────────────────────
 
 function SportGrid({ onSelect }: { onSelect: (s: string) => void }) {
@@ -685,14 +761,17 @@ function SportGrid({ onSelect }: { onSelect: (s: string) => void }) {
           <button
             key={sport}
             onClick={() => onSelect(sport)}
-            className="group rounded-2xl p-5 flex flex-col items-center gap-3 border transition-all hover:scale-105 active:scale-95 cursor-pointer text-left"
+            className="group aspect-square rounded-2xl p-5 flex flex-col items-center gap-3 border transition-all hover:scale-105 active:scale-95 cursor-pointer text-left"
             style={{
-              background: `linear-gradient(145deg,${hex.accent}18 0%,${hex.dim} 70%)`,
+              background: `linear-gradient(160deg, ${hex.accent}28 0%, ${hex.accent}10 40%, #080c10 100%)`,
               borderColor: `${hex.accent}30`,
+              boxShadow: `0 0 24px ${hex.glow}15`,
+              borderBottom: `3px solid ${hex.accent}60`,
+              transition: "all 0.2s",
             }}
           >
             <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl transition-transform group-hover:scale-110"
+              className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl transition-transform group-hover:scale-110"
               style={{
                 background: `${hex.accent}20`,
                 border: `2px solid ${hex.accent}40`,
@@ -723,8 +802,15 @@ export default function VarsityPage() {
   const [, setLocation] = useLocation();
   const [activeSport, setActiveSport] = useState<string | null>(params.sport ?? null);
   const [showRegister, setShowRegister] = useState(false);
+  const [throwingSport, setThrowingSport] = useState<string | null>(null);
 
   const handleSelect = (sport: string) => {
+    setThrowingSport(sport);
+  };
+
+  const onThrowDone = () => {
+    const sport = throwingSport!;
+    setThrowingSport(null);
     setActiveSport(sport);
     setLocation(`/varsity/${sport}`, { replace: true });
   };
@@ -740,39 +826,53 @@ export default function VarsityPage() {
 
   return (
     <div className="flex-1 bg-background animate-in fade-in duration-400">
+      {throwingSport && <SportThrowOverlay sport={throwingSport} onDone={onThrowDone} />}
       {/* Hero */}
-      <div className="bg-card border-b border-border pt-8 pb-7 px-4 md:px-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-end gap-3 mb-2">
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-primary">Varsity</h1>
-            <span className="text-4xl mb-0.5">🎓</span>
-          </div>
-          <p className="text-muted-foreground text-base mb-5">
-            Inter-university sports of Ahmedabad. Register with your uni ID, represent your campus, and battle it out.
-          </p>
+      <div
+        className="relative overflow-hidden pt-10 pb-8 px-4 md:px-8"
+        style={{ background: "radial-gradient(ellipse 120% 100% at 50% 0%, #00B4E012 0%, #6366f108 40%, transparent 70%)" }}
+      >
+        {/* Left bolt watermark */}
+        <Bolt style={{ position:"absolute", top:0, left:"-20px", width:240, height:480, color:"#00B4E0", opacity:0.07, transform:"rotate(-15deg)", pointerEvents:"none" }} />
+        {/* Right bolt watermark */}
+        <Bolt style={{ position:"absolute", top:0, right:"-20px", width:180, height:360, color:"#6366f1", opacity:0.06, transform:"rotate(16deg) scaleX(-1)", pointerEvents:"none" }} />
 
-          <div className="flex items-center gap-3 flex-wrap">
-            <Button
-              size="sm"
-              className="gap-2 font-bold bg-primary text-primary-foreground hover:bg-primary/90"
-              onClick={() => setShowRegister(v => !v)}
-            >
-              <GraduationCap className="w-4 h-4" />
-              {showRegister ? "Close" : "Register as Athlete"}
-            </Button>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><GraduationCap className="w-3.5 h-3.5" />{UNIVERSITIES.length} universities</span>
-              <span className="flex items-center gap-1"><Swords className="w-3.5 h-3.5" />{VARSITY_CLASHES.length} clashes</span>
-              <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{UNIVERSITIES.reduce((sum, u) => sum + u.athletes.length, 0)} athletes</span>
+        <div className="max-w-5xl mx-auto flex items-start justify-between gap-6 flex-wrap relative">
+          <div>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none mb-3">
+              <span className="text-foreground block">The</span>
+              <span style={{ color: "#ffffff", textShadow: "0 0 40px #00B4E0aa, 0 0 80px #00B4E050" }}>Varsity.</span>
+            </h1>
+            <p className="text-muted-foreground text-base mb-4">
+              Inter-university sports of Ahmedabad. Represent your campus, battle it out.
+            </p>
+            {/* Stats pills */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="rounded-full px-3 py-1 text-xs font-bold border" style={{ borderColor:"#00B4E040", color:"#00B4E0", background:"#00B4E010", boxShadow:"0 0 10px #00B4E020" }}>
+                {UNIVERSITIES.length} Universities
+              </span>
+              <span className="rounded-full px-3 py-1 text-xs font-bold border" style={{ borderColor:"#6366f140", color:"#818cf8", background:"#6366f110", boxShadow:"0 0 10px #6366f120" }}>
+                {VARSITY_CLASHES.length} Clashes
+              </span>
+              <span className="rounded-full px-3 py-1 text-xs font-bold border" style={{ borderColor:"#6366f140", color:"#818cf8", background:"#6366f110", boxShadow:"0 0 10px #6366f120" }}>
+                {UNIVERSITIES.reduce((sum, u) => sum + u.athletes.length, 0)} Athletes
+              </span>
             </div>
           </div>
-
-          {showRegister && (
-            <div className="mt-5 max-w-xl">
-              <RegisterForm sport="" onClose={() => setShowRegister(false)} />
-            </div>
-          )}
+          <Button
+            className="gap-2 font-black text-base text-white shrink-0"
+            style={{ background:"linear-gradient(135deg, #00B4E0, #6366f1)", boxShadow:"0 0 30px #00B4E040", padding:"24px 32px" }}
+            onClick={() => setShowRegister(v => !v)}
+          >
+            <GraduationCap className="w-5 h-5" />
+            {showRegister ? "Close" : "Register as Athlete"}
+          </Button>
         </div>
+        {showRegister && (
+          <div className="mt-5 max-w-xl mx-auto relative">
+            <RegisterForm sport="" onClose={() => setShowRegister(false)} />
+          </div>
+        )}
       </div>
 
       {/* Overall standings summary */}
