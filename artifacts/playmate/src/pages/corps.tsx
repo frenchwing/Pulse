@@ -153,59 +153,69 @@ function CorpCard({ corp }: { corp: Club2 }) {
         borderColor: `${hex.accent}25`,
       }}
     >
-      <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${hex.glow}, ${hex.accent})` }} />
+      {/* Banner */}
+      <div
+        className="relative flex items-center justify-center"
+        style={{
+          height: 72,
+          background: `linear-gradient(135deg, ${hex.accent}40, ${hex.dim})`,
+        }}
+      >
+        <span
+          className="text-4xl"
+          style={{ filter: `drop-shadow(0 0 12px ${hex.glow})` }}
+        >
+          {sportEmoji(corp.sport)}
+        </span>
+        <div
+          className="absolute top-2 right-3 font-black text-sm px-2 py-0.5 rounded bg-black/40 text-white"
+        >
+          {corp.wins}W-{corp.losses}L
+        </div>
+      </div>
 
       <div className="p-5 flex flex-col gap-3">
         {/* Header */}
-        <div className="flex items-start gap-3">
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0 font-black shadow-lg"
-            style={{ background: `${hex.accent}22`, border: `1.5px solid ${hex.accent}44` }}
-          >
-            {sportEmoji(corp.sport)}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-black text-foreground tracking-tight leading-tight">{corp.name}</h3>
-            {corp.tagline && (
-              <p className="text-xs text-muted-foreground italic mt-0.5 truncate">&ldquo;{corp.tagline}&rdquo;</p>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-xl font-black text-foreground tracking-tight leading-tight">{corp.name}</h3>
+          {corp.tagline && (
+            <p className="text-sm text-muted-foreground italic mt-1">&ldquo;{corp.tagline}&rdquo;</p>
+          )}
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {corp.area && (
+              <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                <MapPin className="w-2.5 h-2.5" />{corp.area}
+              </span>
             )}
-            <div className="flex flex-wrap gap-1 mt-1.5">
-              {corp.area && (
-                <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                  <MapPin className="w-2.5 h-2.5" />{corp.area}
-                </span>
-              )}
-              {corp.isExclusive && (
-                <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                  <Lock className="w-2.5 h-2.5" /> By inquiry
-                </span>
-              )}
-            </div>
+            {corp.isExclusive && (
+              <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                <Lock className="w-2.5 h-2.5" /> By inquiry
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2">
-          {/* Reliability */}
-          <div className={`rounded-lg px-2 py-1.5 border text-center ${rb.color} ${rb.border}`}>
+        {/* Stats row — horizontal with dividers */}
+        <div className="flex items-center gap-4 py-2 border-y border-border/40">
+          <div className="text-center flex-1">
             <div className="text-base">{rb.emoji}</div>
-            <div className="text-[9px] font-black uppercase tracking-wide leading-tight">{rb.label}</div>
+            <div className="text-[9px] font-black uppercase tracking-wide leading-tight mt-0.5">{rb.label}</div>
+            <div className="text-[9px] text-muted-foreground">Reliability</div>
           </div>
-
-          {/* Dope level */}
-          <div className="rounded-lg px-2 py-1.5 border border-border/60 bg-background/30 text-center">
+          <div className="w-px h-8 bg-border/50" />
+          <div className="text-center flex-1">
             <div className="text-base">{dopeLevel(corp.avgDopeLevel).emoji}</div>
-            <div className="text-[9px] font-black uppercase tracking-wide leading-tight" style={{ color: dopeLevel(corp.avgDopeLevel).color }}>
+            <div className="text-[9px] font-black uppercase tracking-wide leading-tight mt-0.5" style={{ color: dopeLevel(corp.avgDopeLevel).color }}>
               Lv.{corp.avgDopeLevel}
             </div>
+            <div className="text-[9px] text-muted-foreground">Dope Lv</div>
           </div>
-
-          {/* Record */}
-          <div className="rounded-lg px-2 py-1.5 border border-border/60 bg-background/30 text-center">
+          <div className="w-px h-8 bg-border/50" />
+          <div className="text-center flex-1">
             <div className="text-sm font-black" style={{ color: hex.accent }}>
               {corp.wins}W-{corp.losses}L
             </div>
-            <div className="text-[9px] text-muted-foreground uppercase tracking-wide leading-tight">Record</div>
+            <div className="text-[9px] text-muted-foreground uppercase tracking-wide leading-tight mt-0.5">Record</div>
           </div>
         </div>
 
@@ -260,10 +270,17 @@ function CorpCard({ corp }: { corp: Club2 }) {
 
         {/* CTA */}
         <Button
-          variant="outline"
           size="sm"
-          className="w-full gap-2 font-medium transition-all"
-          style={open ? {} : { borderColor: `${hex.accent}40`, color: hex.accent }}
+          className="w-full gap-2 font-black transition-all text-white"
+          style={open ? {
+            background: "transparent",
+            border: `1px solid ${hex.accent}40`,
+            color: hex.accent,
+          } : {
+            background: `linear-gradient(135deg, ${hex.accent}, ${hex.dim === "#080c10" ? hex.accent + "bb" : hex.dim})`,
+            boxShadow: `0 0 20px ${hex.glow}30`,
+            border: "none",
+          }}
           onClick={() => setOpen(v => !v)}
         >
           {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -590,15 +607,18 @@ function SportGrid({ sports, onSelect }: { sports: string[]; onSelect: (s: strin
           <button
             key={sport}
             onClick={() => onSelect(sport)}
-            className="group rounded-2xl p-5 flex flex-col items-center gap-3 border transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            className="group aspect-square rounded-2xl p-5 flex flex-col items-center justify-center gap-3 border cursor-pointer"
             style={{
-              background: `linear-gradient(145deg, ${hex.accent}18 0%, ${hex.dim} 70%)`,
+              background: `linear-gradient(160deg, ${hex.accent}28 0%, ${hex.accent}10 40%, #080c10 100%)`,
               borderColor: `${hex.accent}30`,
+              boxShadow: `0 0 24px ${hex.glow}15`,
+              borderBottom: `3px solid ${hex.accent}60`,
+              transition: "all 0.2s",
             }}
           >
             {/* Sport icon */}
             <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shadow-lg transition-transform group-hover:scale-110"
+              className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl shadow-lg transition-transform group-hover:scale-110"
               style={{
                 background: `${hex.accent}20`,
                 border: `2px solid ${hex.accent}40`,
@@ -612,6 +632,7 @@ function SportGrid({ sports, onSelect }: { sports: string[]; onSelect: (s: strin
               <div className="text-sm font-black capitalize tracking-tight" style={{ color: hex.accent }}>
                 {sport}
               </div>
+              <span className="text-[10px] text-muted-foreground mt-0.5 block">Tap to explore</span>
             </div>
           </button>
         );
@@ -634,6 +655,8 @@ function CorpsList({ sport, onBack }: { sport: string; onBack: () => void }) {
     <div className="flex-1 animate-in fade-in slide-in-from-right-4 duration-300">
       {/* Sport header */}
       <div className="sticky top-14 z-40 border-b border-border backdrop-blur bg-card/80">
+        {/* Colored accent bar */}
+        <div style={{ height: 3, background: `linear-gradient(90deg, ${hex.glow}, ${hex.accent}, ${hex.glow})` }} />
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-3 flex items-center gap-3">
           <button
             onClick={onBack}
@@ -643,12 +666,16 @@ function CorpsList({ sport, onBack }: { sport: string; onBack: () => void }) {
           </button>
           <div className="w-px h-4 bg-border" />
           <div
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-lg"
-            style={{ background: `${hex.accent}20`, border: `1px solid ${hex.accent}40` }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-xl"
+            style={{
+              background: `${hex.accent}20`,
+              border: `1px solid ${hex.accent}40`,
+              boxShadow: `0 0 14px ${hex.glow}40`,
+            }}
           >
             {sportEmoji(sport)}
           </div>
-          <h2 className="font-black text-lg capitalize" style={{ color: hex.accent }}>{sport} Corps</h2>
+          <h2 className="font-black text-xl capitalize" style={{ color: hex.accent }}>{sport} Corps</h2>
           <Badge variant="outline" className="ml-auto text-muted-foreground">{allCorps.length} corps</Badge>
         </div>
       </div>
@@ -776,23 +803,75 @@ export default function CorpsPage() {
       {showCreateForm && <CreateCorpForm onClose={() => setShowCreateForm(false)} />}
 
       {/* Hero */}
-      <div className="bg-card border-b border-border pt-8 pb-7 px-4 md:px-8">
-        <div className="max-w-5xl mx-auto flex items-start justify-between gap-4 flex-wrap">
+      <div
+        className="border-b border-border pt-12 pb-10 px-4 md:px-8"
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          background: "radial-gradient(ellipse 120% 100% at 50% 0%, #f9731612 0%, #00B4E00a 40%, transparent 70%)",
+        }}
+      >
+        {/* Cyan bolt watermark — top-left */}
+        <Bolt style={{
+          position: "absolute",
+          top: 0, left: "-40px",
+          width: 240, height: 480,
+          color: "#00B4E0",
+          opacity: 0.07,
+          transform: "rotate(-15deg)",
+          pointerEvents: "none",
+        }} />
+        {/* Orange bolt watermark — top-right */}
+        <Bolt style={{
+          position: "absolute",
+          top: 0, right: "-20px",
+          width: 180, height: 360,
+          color: "#f97316",
+          opacity: 0.06,
+          transform: "rotate(16deg) scaleX(-1)",
+          pointerEvents: "none",
+        }} />
+
+        <div className="max-w-5xl mx-auto flex items-start justify-between gap-6 flex-wrap relative">
           <div>
-            <div className="flex items-end gap-3 mb-2">
-              <h1 className="text-4xl md:text-5xl font-black tracking-tight text-primary">The Corps</h1>
-              <span className="text-4xl mb-0.5">⚔️</span>
-            </div>
-            <p className="text-muted-foreground text-base">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-none mb-3">
+              <span className="text-foreground block">The</span>
+              <span style={{
+                background: "linear-gradient(135deg, #f97316 0%, #ea580c 50%, #00B4E0 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}>Corps.</span>
+            </h1>
+            <p className="text-muted-foreground text-base mb-4">
               Elite sports crews of Ahmedabad. Pick your sport. Find your people.
             </p>
+            {/* Stats strip */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className="rounded-full px-3 py-1 text-xs font-bold border"
+                style={{ borderColor: "#00B4E040", color: "#00B4E0", background: "#00B4E010", boxShadow: "0 0 10px #00B4E020" }}
+              >
+                {allCorps.length} Corps
+              </span>
+              <span
+                className="rounded-full px-3 py-1 text-xs font-bold border"
+                style={{ borderColor: "#f9731640", color: "#f97316", background: "#f9731610", boxShadow: "0 0 10px #f9731620" }}
+              >
+                {sportsWithCorps.length} Sports
+              </span>
+            </div>
           </div>
           <Button
             onClick={() => setShowCreateForm(true)}
-            className="gap-2 font-black text-sm px-5 py-5 text-primary-foreground shrink-0"
-            style={{ background: "linear-gradient(135deg, #00B4E0, #0891b2)", boxShadow: "0 0 20px #00B4E030" }}
+            className="gap-2 font-black text-base text-white shrink-0"
+            style={{
+              background: "linear-gradient(135deg, #f97316, #ea580c)",
+              boxShadow: "0 0 30px #f9731640",
+              padding: "24px 32px",
+            }}
           >
-            <Plus className="w-4 h-4" /> Start a Corp
+            <Plus className="w-5 h-5" /> Start a Corp
           </Button>
         </div>
       </div>
@@ -805,16 +884,20 @@ export default function CorpsPage() {
             ))}
           </div>
         ) : sportsWithCorps.length === 0 ? (
-          <div className="text-center py-20 text-muted-foreground">
-            <div className="text-5xl mb-4">⚔️</div>
-            <p className="text-lg font-bold text-foreground mb-2">No corps formed yet</p>
-            <p className="text-sm mb-6">Be the first to establish one.</p>
+          <div className="text-center py-24 text-muted-foreground">
+            <Swords className="w-16 h-16 mx-auto mb-5" style={{ opacity: 0.4 }} />
+            <p className="text-2xl font-black text-foreground mb-2">No corps formed yet.</p>
+            <p className="text-sm mb-8">The arena is empty. Change that.</p>
             <Button
               onClick={() => setShowCreateForm(true)}
-              className="gap-2 font-black px-6 py-5 text-primary-foreground"
-              style={{ background: "linear-gradient(135deg, #00B4E0, #0891b2)", boxShadow: "0 0 24px #00B4E030" }}
+              className="gap-2 font-black text-base text-white"
+              style={{
+                background: "linear-gradient(135deg, #f97316, #ea580c)",
+                boxShadow: "0 0 30px #f9731640",
+                padding: "20px 36px",
+              }}
             >
-              <Swords className="w-4 h-4" /> Found the First Corp
+              <Swords className="w-5 h-5" /> Found the First Corp
             </Button>
           </div>
         ) : (
