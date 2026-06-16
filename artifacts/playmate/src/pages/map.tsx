@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useListActivities, useListEvents, useListProfiles } from "@/hooks/use-firestore";
 type Profile = any;
@@ -305,6 +305,28 @@ function FriendPopup({ profile }: { profile: Profile }) {
   );
 }
 
+function createBoltSparkMarker(color: string, glow: string) {
+  return L.divIcon({
+    className: "bolt-spark-marker",
+    html: `
+      <div style="position:relative;width:56px;height:64px;">
+        <div style="position:absolute;top:0;left:50%;animation:bolt-drop-in 1.2s ease-out 1 forwards;pointer-events:none;">
+          <svg width="20" height="36" viewBox="0 0 20 36" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 8px ${color})">
+            <polygon points="12,0 4,16 9,16 2,36 18,14 12,14" fill="${color}" />
+          </svg>
+        </div>
+        <div style="position:absolute;bottom:6px;left:50%;width:14px;height:14px;margin-left:-7px;">
+          <div style="position:absolute;inset:0;border-radius:50%;border:2px solid ${color};animation:spark-ring-once 0.55s ease-out 0.25s 1 forwards;opacity:0;"></div>
+          <div style="position:absolute;inset:-5px;border-radius:50%;border:1.5px solid ${color}70;animation:spark-ring-once 0.65s ease-out 0.38s 1 forwards;opacity:0;"></div>
+        </div>
+        <div style="position:absolute;bottom:2px;left:50%;width:32px;height:32px;margin-left:-16px;border-radius:50%;background:${glow};animation:bolt-ground-flash 0.6s ease-out 0.15s 1 forwards;opacity:0;filter:blur(8px);"></div>
+      </div>`,
+    iconSize: [56, 64],
+    iconAnchor: [28, 58],
+    popupAnchor: [0, -62],
+  });
+}
+
 // ── Main map page ─────────────────────────────────────────────────────────────
 
 type MapMode = "normal" | "corp";
@@ -337,7 +359,79 @@ export default function MapPage() {
   const isLoading = loadingActivities || loadingEvents || loadingProfiles;
   const totalCorpActive = HOTSPOTS.reduce((sum, h) => sum + h.active, 0);
 
+  // Corp mode: randomly spark hotspots to simulate live activity
+  const [sparkingHotspotId, setSparkingHotspotId] = useState<number | null>(null);
+  const [sparkKey, setSparkKey] = useState(0);
+
+  useEffect(() => {
+    if (mapMode !== "corp") { setSparkingHotspotId(null); return; }
+    // Immediately spark one on mode entry
+    const first = HOTSPOTS[Math.floor(Math.random() * HOTSPOTS.length)];
+    setSparkingHotspotId(first.id);
+    setSparkKey(k => k + 1);
+    const clearFirst = setTimeout(() => setSparkingHotspotId(null), 1800);
+
+    const interval = setInterval(() => {
+      const spot = HOTSPOTS[Math.floor(Math.random() * HOTSPOTS.length)];
+      setSparkingHotspotId(spot.id);
+      setSparkKey(k => k + 1);
+      setTimeout(() => setSparkingHotspotId(null), 1800);
+    }, 5500);
+
+    return () => { clearInterval(interval); clearTimeout(clearFirst); };
+  }, [mapMode]);
+
+  // Normal mode: track genuinely new Firestore markers
+  const seenIds = useRef<Set<string> | null>(null);
+  const [newMarkerIds, setNewMarkerIds] = useState(new Set<string>());
+
+  useEffect(() => {
+    const allCurrent = [
+      ...(activities || []).map((a: any) => `act-${a.id}`),
+      ...(events || []).map((e: any) => `evt-${e.id}`),
+    ];
+    if (seenIds.current === null) {
+      seenIds.current = new Set(allCurrent);
+      return;
+    }
+    const fresh: string[] = [];
+    for (const id of allCurrent) {
+      if (!seenIds.current.has(id)) { fresh.push(id); seenIds.current.add(id); }
+    }
+    if (fresh.length > 0) {
+      setNewMarkerIds(prev => new Set([...prev, ...fresh]));
+      setTimeout(() => setNewMarkerIds(new Set()), 2200);
+    }
+  }, [activities, events]);
+
   return (
+    <>
+    <style>{`
+  @keyframes bolt-drop-in {
+    0%   { transform: translateX(-50%) translateY(-36px) scaleY(0.2); opacity: 0; }
+    35%  { transform: translateX(-50%) translateY(0) scaleY(1); opacity: 1; filter: brightness(3) drop-shadow(0 0 10px currentColor); }
+    65%  { transform: translateX(-50%) translateY(0) scaleY(1); opacity: 0.7; }
+    100% { transform: translateX(-50%) translateY(0) scaleY(1); opacity: 0; }
+  }
+  @keyframes spark-ring-once {
+    0%   { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3.5); opacity: 0; }
+  }
+  @keyframes bolt-ground-flash {
+    0%   { opacity: 0; transform: scale(0.5); }
+    25%  { opacity: 0.7; transform: scale(1.5); }
+    60%  { opacity: 0.3; transform: scale(2.5); }
+    100% { opacity: 0; transform: scale(3.5); }
+  }
+  @keyframes sonar-expand {
+    0%   { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(4); opacity: 0; }
+  }
+  @keyframes blip-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%       { opacity: 0.8; transform: scale(1.1); }
+  }
+`}</style>
     <div className="absolute inset-0 flex flex-col h-full w-full">
 
       {/* ── Corp mode: rotating radar sweep overlay ── */}
@@ -634,6 +728,25 @@ export default function MapPage() {
                 </Popup>
               </Marker>
             ))}
+
+            {/* Bolt sparks on new real-time markers */}
+            {[...newMarkerIds].map(nid => {
+              const isAct = nid.startsWith("act-");
+              const id = nid.slice(4);
+              const item = isAct
+                ? (activities || []).find((a: any) => a.id === id)
+                : (events || []).find((e: any) => e.id === id);
+              if (!item) return null;
+              const hex = sportHex(item.type);
+              return (
+                <Marker
+                  key={`spark-${nid}`}
+                  position={[item.latitude, item.longitude]}
+                  icon={createBoltSparkMarker(hex.accent, hex.glow)}
+                  zIndexOffset={2000}
+                />
+              );
+            })}
           </>
         )}
 
@@ -654,6 +767,21 @@ export default function MapPage() {
               </Marker>
             ))}
 
+            {/* Bolt spark on active hotspot */}
+            {sparkingHotspotId !== null && (() => {
+              const spot = HOTSPOTS.find(h => h.id === sparkingHotspotId);
+              if (!spot) return null;
+              const hex = sportHex(spot.sport);
+              return (
+                <Marker
+                  key={`spark-${spot.id}-${sparkKey}`}
+                  position={[spot.lat, spot.lng]}
+                  icon={createBoltSparkMarker(hex.accent, hex.glow)}
+                  zIndexOffset={2000}
+                />
+              );
+            })()}
+
             {/* Corps member radar blips */}
             {showFriends && friendsOnMap.map(profile => (
               <Marker
@@ -671,5 +799,6 @@ export default function MapPage() {
         )}
       </MapContainer>
     </div>
+    </>
   );
 }
