@@ -16,7 +16,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useState } from "react";
 import { Bolt } from "@/components/bolt";
-import { sportHex, loyaltyBadge } from "@/lib/sport-meta";
+import { sportHex, loyaltyBadge, skillToDope } from "@/lib/sport-meta";
+import { PlayerCardModal } from "@/components/player-card";
 
 const kycSchema = z.object({
   docType: z.string().min(1, "Document type is required"),
@@ -30,6 +31,7 @@ export default function ProfilePage() {
   const queryClient = useQueryClient();
   
   const [kycOpen, setKycOpen] = useState(false);
+  const [cardOpen, setCardOpen] = useState(false);
 
   const { data: profile, isLoading } = useGetProfile(id);
 
@@ -69,8 +71,10 @@ export default function ProfilePage() {
   const kycColor = profile.kycStatus === 'verified' ? 'bg-green-500/20 text-green-400' : profile.kycStatus === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-500/20 text-gray-400';
 
   const primarySport = profile.sports?.[0]?.sport ?? "other";
+  const primarySkill = profile.sports?.[0]?.skillLevel ?? "intermediate";
   const hex = sportHex(primarySport);
   const lb = loyaltyBadge(profile.streakWeeks || 0, profile.gamesPlayed || 0);
+  const dopeRating = skillToDope(primarySkill, id || profile.name || "");
 
   return (
     <div className="flex-1 bg-background animate-in fade-in duration-500 pb-20">
@@ -83,10 +87,19 @@ export default function ProfilePage() {
         <Bolt style={{ position:"absolute", top:0, right:"-20px", width:160, height:320, color:"#6366f1", opacity:0.06, transform:"rotate(16deg) scaleX(-1)", pointerEvents:"none" }} />
 
         <div className="max-w-3xl mx-auto relative flex flex-col md:flex-row gap-8 items-start md:items-center">
-          <div className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setCardOpen(true)}
+            className="relative shrink-0 cursor-pointer group focus:outline-none transition-transform hover:scale-[1.04] active:scale-[0.98]"
+            aria-label="View player card"
+          >
             <Avatar
-              className="w-32 h-32 border-4 shadow-2xl"
-              style={{ borderColor: hex.accent, boxShadow: `0 0 40px ${hex.glow}50` }}
+              className="w-32 h-32 border-4 shadow-2xl transition-all group-hover:shadow-[0_0_60px_var(--avatar-glow)]"
+              style={{
+                borderColor: hex.accent,
+                boxShadow: `0 0 40px ${hex.glow}50`,
+                ["--avatar-glow" as any]: `${hex.glow}aa`,
+              }}
             >
               <AvatarImage src={profile.avatarUrl ?? undefined} />
               <AvatarFallback
@@ -107,7 +120,13 @@ export default function ProfilePage() {
             >
               {lb.emoji} {lb.label}
             </div>
-          </div>
+            <span
+              className="absolute -top-2 -right-2 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ background: hex.accent, color: "#0a0e14", boxShadow: `0 0 14px ${hex.accent}` }}
+            >
+              Tap
+            </span>
+          </button>
 
           <div className="flex-1 space-y-4 pt-2">
             <div className="flex flex-wrap items-center gap-3">
@@ -289,6 +308,13 @@ export default function ProfilePage() {
           </Collapsible>
         )}
       </div>
+
+      <PlayerCardModal
+        open={cardOpen}
+        onOpenChange={setCardOpen}
+        profile={profile as any}
+        dopeRating={dopeRating}
+      />
     </div>
   );
 }

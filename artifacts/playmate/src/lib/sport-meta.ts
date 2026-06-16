@@ -69,18 +69,21 @@ export function sportHex(type: string) {
   return SPORT_HEX[type?.toLowerCase()] ?? { accent: "#94a3b8", glow: "#475569", dim: "#0f172a" };
 }
 
-// Dope Levels 1-10 with funny descriptions
-export const DOPE_LEVELS: Record<number, { name: string; desc: string; emoji: string; color: string }> = {
-  1:  { name: "Just Showed Up",        desc: "Has underdeveloped limbs",                 emoji: "🐣", color: "#ef4444" },
-  2:  { name: "Getting Dressed",        desc: "Has the gear, skills still downloading",   emoji: "🌱", color: "#f87171" },
-  3:  { name: "Has a Sports Bag",       desc: "Looks the part, that's about it",          emoji: "🎒", color: "#f97316" },
-  4:  { name: "YouTube Certified",      desc: "Studied the move, never landed it",        emoji: "📱", color: "#fb923c" },
-  5:  { name: "Weekend Warrior",        desc: "Monday hero, Friday nobody",               emoji: "⚔️", color: "#eab308" },
-  6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#a3e635" },
-  7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#4ade80" },
-  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "🔥", color: "#34d399" },
-  9:  { name: "Walking Highlight Reel", desc: "Only limited by his team",                 emoji: "🎥", color: "#22d3ee" },
-  10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "👑", color: "#00B4E0" },
+// Dope Levels 1-10 — card-game rarity tier palette (common → mythic)
+// color = outline color of the player card at this tier
+// glow  = stronger version used for shadows/auras
+// tier  = display label (Common / Rare / Epic / Legendary / Mythic)
+export const DOPE_LEVELS: Record<number, { name: string; desc: string; emoji: string; color: string; glow: string; tier: string }> = {
+  1:  { name: "Just Showed Up",        desc: "Has underdeveloped limbs",                 emoji: "🐣", color: "#64748b", glow: "#94a3b8", tier: "Rookie"     },
+  2:  { name: "Getting Dressed",        desc: "Has the gear, skills still downloading",   emoji: "🌱", color: "#a16207", glow: "#d97706", tier: "Casual"     },
+  3:  { name: "Has a Sports Bag",       desc: "Looks the part, that's about it",          emoji: "🎒", color: "#65a30d", glow: "#84cc16", tier: "Backup"     },
+  4:  { name: "YouTube Certified",      desc: "Studied the move, never landed it",        emoji: "📱", color: "#15803d", glow: "#22c55e", tier: "Solid"      },
+  5:  { name: "Weekend Warrior",        desc: "Monday hero, Friday nobody",               emoji: "⚔️", color: "#0d9488", glow: "#14b8a6", tier: "Pro"        },
+  6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#00B4E0", glow: "#22d3ee", tier: "Sharp"      },
+  7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#3b82f6", glow: "#60a5fa", tier: "Elite"      },
+  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "🔥", color: "#a855f7", glow: "#c084fc", tier: "Legendary"  },
+  9:  { name: "Walking Highlight Reel", desc: "Only limited by his team",                 emoji: "🎥", color: "#e11d48", glow: "#f43f5e", tier: "Mythic"     },
+  10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "👑", color: "#fbbf24", glow: "#fcd34d", tier: "Godlike"    },
 };
 
 export function dopeLevel(level: number) {
@@ -105,6 +108,15 @@ export const LOYALTY_TIERS = [
   { label: "Regular",   emoji: "✅", color: "#22c55e", ringClass: "ring-green-500",  desc: "Shows up, gives 100%, no drama"                       },
   { label: "New Blood", emoji: "🌱", color: "#6b7280", ringClass: "ring-gray-500",   desc: "Still finding their footing — watch this space"       },
 ] as const;
+
+// Bolt Level 1-10 — momentum/energy rating shown on the player card.
+// streakWeeks weighs heavier than total games (bolt = current energy, not lifetime stats)
+export function boltLevel(streakWeeks: number, gamesPlayed: number): number {
+  const sw = Math.min(streakWeeks || 0, 20);
+  const gp = Math.min(gamesPlayed || 0, 100);
+  const raw = (sw / 20) * 7 + (gp / 100) * 3;
+  return Math.max(1, Math.min(10, Math.round(raw))) || 1;
+}
 
 export function loyaltyBadge(streakWeeks: number, gamesPlayed: number) {
   if (streakWeeks >= 10 || gamesPlayed >= 60) return LOYALTY_TIERS[0];
