@@ -74,16 +74,16 @@ export function sportHex(type: string) {
 // glow  = stronger version used for shadows/auras
 // tier  = display label (Common / Rare / Epic / Legendary / Mythic)
 export const DOPE_LEVELS: Record<number, { name: string; desc: string; emoji: string; color: string; glow: string; tier: string }> = {
-  1:  { name: "Just Showed Up",        desc: "Has underdeveloped limbs",                 emoji: "🐣", color: "#64748b", glow: "#94a3b8", tier: "Rookie"     },
-  2:  { name: "Getting Dressed",        desc: "Has the gear, skills still downloading",   emoji: "🌱", color: "#a16207", glow: "#d97706", tier: "Casual"     },
-  3:  { name: "Has a Sports Bag",       desc: "Looks the part, that's about it",          emoji: "🎒", color: "#65a30d", glow: "#84cc16", tier: "Backup"     },
-  4:  { name: "YouTube Certified",      desc: "Studied the move, never landed it",        emoji: "📱", color: "#15803d", glow: "#22c55e", tier: "Solid"      },
-  5:  { name: "Weekend Warrior",        desc: "Monday hero, Friday nobody",               emoji: "⚔️", color: "#0d9488", glow: "#14b8a6", tier: "Pro"        },
-  6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#00B4E0", glow: "#22d3ee", tier: "Sharp"      },
-  7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#3b82f6", glow: "#60a5fa", tier: "Elite"      },
-  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "🔥", color: "#a855f7", glow: "#c084fc", tier: "Legendary"  },
-  9:  { name: "Walking Highlight Reel", desc: "Only limited by his team",                 emoji: "🎥", color: "#e11d48", glow: "#f43f5e", tier: "Mythic"     },
-  10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "👑", color: "#fbbf24", glow: "#fcd34d", tier: "Godlike"    },
+  1:  { name: "Just Showed Up",        desc: "Has underdeveloped limbs",                 emoji: "🐣", color: "#f8fafc", glow: "#ffffff", tier: "Rookie"   },
+  2:  { name: "Getting Dressed",        desc: "Has the gear, skills still downloading",   emoji: "🌱", color: "#c8a878", glow: "#e0c9a6", tier: "Casual"   },
+  3:  { name: "Has a Sports Bag",       desc: "Looks the part, that's about it",          emoji: "🎒", color: "#eab308", glow: "#fde047", tier: "Backup"   },
+  4:  { name: "YouTube Certified",      desc: "Studied the move, never landed it",        emoji: "📱", color: "#f97316", glow: "#fb923c", tier: "Solid"    },
+  5:  { name: "Weekend Warrior",        desc: "Monday hero, Friday nobody",               emoji: "⚔️", color: "#78350f", glow: "#92400e", tier: "Pro"      },
+  6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#8b0000", glow: "#dc2626", tier: "Sharp"    },
+  7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#1f51ff", glow: "#60a5fa", tier: "Elite"    },
+  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "🔥", color: "#10b981", glow: "#34d399", tier: "Legendary"},
+  9:  { name: "Walking Highlight Reel", desc: "Only limited by his team",                 emoji: "🎥", color: "#fbbf24", glow: "#fde68a", tier: "Galactic" },
+  10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "👑", color: "#5b21b6", glow: "#8b5cf6", tier: "Mythic"   },
 };
 
 export function dopeLevel(level: number) {

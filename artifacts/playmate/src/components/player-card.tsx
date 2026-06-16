@@ -32,6 +32,7 @@ export function PlayerCardModal({ open, onOpenChange, profile, dopeRating }: Pla
   const primarySport = profile.sports?.[0]?.sport ?? "other";
   const hex = sportHex(primarySport);
   const isMythic = clampedRating === 10;
+  const isGalactic = clampedRating === 9;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -54,20 +55,28 @@ export function PlayerCardModal({ open, onOpenChange, profile, dopeRating }: Pla
             60%  { transform: translateX(220%)  skewX(-20deg); }
             100% { transform: translateX(220%)  skewX(-20deg); }
           }
-          .pc-wrap   { animation: pc-enter 600ms cubic-bezier(.2,.7,.2,1.3) backwards,
-                                  pc-float 4.5s ease-in-out 800ms infinite; }
-          .pc-mythic { background: linear-gradient(120deg, #fbbf24, #f472b6, #a855f7, #3b82f6, #00B4E0, #fbbf24);
-                       background-size: 300% 300%; animation: pc-mythic 4s linear infinite; }
-          .pc-shine  { animation: pc-shine 2.6s ease-in-out 700ms infinite; }
+          @keyframes pc-galactic-pulse {
+            0%,100% { box-shadow: 0 0 50px #fbbf24aa, 0 20px 50px #fbbf2440; }
+            50%     { box-shadow: 0 0 90px #fbbf24ee, 0 20px 60px #fde68a80; }
+          }
+          .pc-wrap     { animation: pc-enter 600ms cubic-bezier(.2,.7,.2,1.3) backwards,
+                                    pc-float 4.5s ease-in-out 800ms infinite; }
+          .pc-mythic   { background: linear-gradient(120deg, #5b21b6, #8b5cf6, #c4b5fd, #8b5cf6, #5b21b6);
+                         background-size: 300% 300%; animation: pc-mythic 4s linear infinite; }
+          .pc-galactic { background: linear-gradient(135deg, #fbbf24 0%, #fde68a 50%, #fbbf24 100%);
+                         animation: pc-galactic-pulse 2.2s ease-in-out infinite; }
+          .pc-shine    { animation: pc-shine 2.6s ease-in-out 700ms infinite; }
         `}</style>
 
         <div className="pc-wrap relative" style={{ perspective: 1200 }}>
           {/* OUTER BORDER — color driven by dope tier */}
           <div
-            className={`rounded-3xl p-[3px] relative ${isMythic ? "pc-mythic" : ""}`}
+            className={`rounded-3xl p-[3px] relative ${isMythic ? "pc-mythic" : isGalactic ? "pc-galactic" : ""}`}
             style={
               isMythic
-                ? { boxShadow: `0 0 70px #fbbf24cc, 0 20px 60px #a855f7aa` }
+                ? { boxShadow: `0 0 70px #8b5cf6cc, 0 20px 60px #5b21b6aa` }
+                : isGalactic
+                ? undefined
                 : {
                     background: `linear-gradient(135deg, ${dope.color} 0%, ${dope.glow} 50%, ${dope.color} 100%)`,
                     boxShadow: `0 0 60px ${dope.color}90, 0 20px 50px ${dope.color}40`,
