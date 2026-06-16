@@ -31,8 +31,8 @@ export function PlayerCardModal({ open, onOpenChange, profile, dopeRating }: Pla
   const bolt = boltLevel(profile.streakWeeks || 0, profile.gamesPlayed || 0);
   const primarySport = profile.sports?.[0]?.sport ?? "other";
   const hex = sportHex(primarySport);
-  const isMythic = clampedRating === 10;
-  const isGalactic = clampedRating === 9;
+  const isGalactic = clampedRating === 10;
+  const isMythic = clampedRating === 9;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
