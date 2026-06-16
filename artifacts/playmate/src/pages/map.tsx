@@ -9,6 +9,7 @@ import { Link } from "wouter";
 import L from "leaflet";
 import { format } from "date-fns";
 import { sportEmoji, sportHex, loyaltyBadge } from "@/lib/sport-meta";
+import { Bolt } from "@/components/bolt";
 
 // ── Hotspot data (Ahmedabad) ───────────────────────────────────────────────────
 
@@ -339,27 +340,64 @@ export default function MapPage() {
   return (
     <div className="absolute inset-0 flex flex-col h-full w-full">
 
+      {/* ── Corp mode: rotating radar sweep overlay ── */}
+      {mapMode === "corp" && (
+        <>
+          <style>{`
+            @keyframes radar-rotate { to { transform: rotate(360deg); } }
+            @keyframes corp-scanline {
+              0%   { background-position: 0 0; }
+              100% { background-position: 0 100px; }
+            }
+          `}</style>
+          {/* Radar sweep */}
+          <div className="absolute inset-0 z-[399] pointer-events-none overflow-hidden">
+            <div style={{
+              position: "absolute",
+              top: "50%", left: "50%",
+              width: "220vmax", height: "220vmax",
+              marginLeft: "-110vmax", marginTop: "-110vmax",
+              background: "conic-gradient(from 0deg, transparent 0%, transparent 88%, #00B4E005 93%, #00B4E018 97%, #00B4E008 100%)",
+              animation: "radar-rotate 5s linear infinite",
+            }} />
+          </div>
+          {/* Scanline vignette */}
+          <div className="absolute inset-0 z-[398] pointer-events-none" style={{
+            background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,180,224,0.015) 3px, rgba(0,180,224,0.015) 4px)",
+            animation: "corp-scanline 4s linear infinite",
+          }} />
+          {/* Corner vignette */}
+          <div className="absolute inset-0 z-[398] pointer-events-none" style={{
+            background: "radial-gradient(ellipse at center, transparent 55%, #00B4E008 100%)",
+          }} />
+        </>
+      )}
+
       {/* ── Mode toggle ── */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[401] flex gap-1 bg-card/95 backdrop-blur p-1 rounded-full border border-border shadow-2xl">
-        <Button
-          variant={mapMode === "normal" ? "default" : "ghost"}
-          size="sm"
-          className={`rounded-full text-xs gap-1.5 ${mapMode === "normal" ? "bg-primary text-primary-foreground font-bold shadow" : "text-muted-foreground"}`}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[401] flex items-center gap-0 rounded-full border shadow-2xl overflow-hidden"
+        style={{ background: "rgba(10,14,20,0.95)", backdropFilter: "blur(12px)", borderColor: mapMode === "corp" ? "#00B4E040" : "#ffffff15" }}
+      >
+        <button
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-black transition-all"
+          style={mapMode === "normal"
+            ? { background: "#00B4E0", color: "#0d1117" }
+            : { color: "#666", background: "transparent" }}
           onClick={() => setMapMode("normal")}
         >
-          <MapIcon className="w-3.5 h-3.5" />
-          Normal
-        </Button>
-        <Button
-          variant={mapMode === "corp" ? "default" : "ghost"}
-          size="sm"
-          className={`rounded-full text-xs gap-1.5 ${mapMode === "corp" ? "font-bold shadow" : "text-muted-foreground"}`}
-          style={mapMode === "corp" ? { background: "#00B4E0", color: "#0d1117" } : {}}
+          <MapIcon className="w-3.5 h-3.5" /> Normal
+        </button>
+        <div className="w-px h-5 bg-white/10 shrink-0" />
+        <button
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-black transition-all"
+          style={mapMode === "corp"
+            ? { background: "linear-gradient(135deg,#00B4E0,#6366f1)", color: "#fff", boxShadow: "inset 0 0 20px #00B4E020" }
+            : { color: "#666", background: "transparent" }}
           onClick={() => setMapMode("corp")}
         >
           <Crosshair className="w-3.5 h-3.5" />
-          Corp Map
-        </Button>
+          Corp Radar
+          {mapMode === "corp" && <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse ml-0.5" style={{ boxShadow: "0 0 4px #22c55e" }} />}
+        </button>
       </div>
 
       {/* ── Normal mode filter bar ── */}
@@ -433,23 +471,35 @@ export default function MapPage() {
 
       {/* ── Corp Intel panel (top-right) ── */}
       {mapMode === "corp" && (
-        <div className="absolute top-4 right-4 z-[400] bg-card/95 backdrop-blur border rounded-xl p-3 shadow-xl" style={{ borderColor: "#00B4E030" }}>
-          <div className="text-[9px] font-black uppercase tracking-widest mb-2" style={{ color: "#00B4E0" }}>
-            ◎ Corp Intel
+        <div className="absolute top-4 right-4 z-[401] rounded-xl p-3 shadow-2xl" style={{
+          background: "rgba(6,10,16,0.92)",
+          backdropFilter: "blur(14px)",
+          border: "1px solid #00B4E030",
+          boxShadow: "0 0 30px #00B4E010, inset 0 0 20px #00B4E005",
+          minWidth: 160,
+        }}>
+          {/* Header */}
+          <div className="flex items-center gap-1.5 mb-3 pb-2" style={{ borderBottom: "1px solid #00B4E020" }}>
+            <Bolt style={{ width: 14, height: 20, color: "#00B4E0", filter: "drop-shadow(0 0 4px #00B4E0)" }} />
+            <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "#00B4E0" }}>Corp Radar</span>
+            <span className="ml-auto flex items-center gap-1 text-[8px] font-black text-green-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" style={{ boxShadow: "0 0 4px #22c55e" }} />
+              LIVE
+            </span>
           </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" style={{ boxShadow: "0 0 4px #22c55e" }} />
-              <span className="text-[10px] text-muted-foreground"><span className="font-black text-foreground">{friendsOnMap.length}</span> members active</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#00B4E0", boxShadow: "0 0 4px #00B4E0" }} />
-              <span className="text-[10px] text-muted-foreground"><span className="font-black text-foreground">{HOTSPOTS.length}</span> hotspots pinging</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0" style={{ boxShadow: "0 0 4px #ef4444" }} />
-              <span className="text-[10px] text-muted-foreground"><span className="font-black text-foreground">{totalCorpActive}</span> corps playing now</span>
-            </div>
+          {/* Stats */}
+          <div className="space-y-2">
+            {[
+              { dot: "#22c55e", label: "members active",    val: friendsOnMap.length },
+              { dot: "#00B4E0", label: "hotspots pinging",  val: HOTSPOTS.length },
+              { dot: "#f97316", label: "corps playing now",  val: totalCorpActive },
+            ].map(({ dot, label, val }) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dot, boxShadow: `0 0 5px ${dot}` }} />
+                <span className="text-[10px] text-muted-foreground flex-1">{label}</span>
+                <span className="text-[11px] font-black text-foreground">{val}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
