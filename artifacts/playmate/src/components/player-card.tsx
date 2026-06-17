@@ -31,9 +31,9 @@ export function PlayerCardModal({ open, onOpenChange, profile, dopeRating }: Pla
   const bolt = boltLevel(profile.streakWeeks || 0, profile.gamesPlayed || 0);
   const primarySport = profile.sports?.[0]?.sport ?? "other";
   const hex = sportHex(primarySport);
-  // T10 Galactic → purple shimmer; T9 Mythic → gold pulse
-  const isGalactic = clampedRating === 9;
-  const isMythic = clampedRating === 10;
+  // T9 Mythic → gold pulse; T10 Galactic → purple shimmer
+  const isMythic = clampedRating === 9;
+  const isGalactic = clampedRating === 10;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -72,15 +72,15 @@ export function PlayerCardModal({ open, onOpenChange, profile, dopeRating }: Pla
         <div className="pc-wrap relative" style={{ perspective: 1200 }}>
           {/* OUTER BORDER — color driven by dope tier */}
           <div
-            className={`rounded-3xl p-[3px] relative ${isMythic ? "pc-mythic" : isGalactic ? "pc-galactic" : ""}`}
+            className={`rounded-3xl p-[4px] relative ${isMythic ? "pc-mythic" : isGalactic ? "pc-galactic" : ""}`}
             style={
               isMythic
                 ? { boxShadow: `0 0 70px #8b5cf6cc, 0 20px 60px #5b21b6aa` }
                 : isGalactic
                 ? undefined
                 : {
-                    background: `linear-gradient(135deg, ${dope.color} 0%, ${dope.glow} 50%, ${dope.color} 100%)`,
-                    boxShadow: `0 0 60px ${dope.color}90, 0 20px 50px ${dope.color}40`,
+                    background: `linear-gradient(135deg, ${dope.glow} 0%, #ffffff 50%, ${dope.glow} 100%)`,
+                    boxShadow: `0 0 70px ${dope.glow}, 0 0 30px ${dope.glow}cc, 0 20px 50px ${dope.color}60`,
                   }
             }
           >

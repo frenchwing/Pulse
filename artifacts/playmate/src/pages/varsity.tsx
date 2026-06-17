@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import {
   GraduationCap, ArrowLeft, Trophy, Swords, Users, Shield,
@@ -689,10 +689,12 @@ function SportThrowOverlay({ sport, onDone }: { sport: string; onDone: () => voi
   const hex = sportHex(sport);
   const Icon = SPORT_ICONS[sport];
 
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
   useEffect(() => {
-    const t = setTimeout(onDone, 780);
+    const t = setTimeout(() => onDoneRef.current(), 780);
     return () => clearTimeout(t);
-  }, [onDone]);
+  }, []); // empty deps — timer fires once regardless of parent re-renders
 
   return (
     <>

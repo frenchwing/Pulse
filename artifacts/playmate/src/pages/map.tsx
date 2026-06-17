@@ -371,19 +371,22 @@ export default function MapPage() {
     setSparkKey(k => k + 1);
     const clearFirst = setTimeout(() => setSparkingHotspotId(null), 1800);
 
+    const clearTimeouts: ReturnType<typeof setTimeout>[] = [];
     const interval = setInterval(() => {
       const spot = HOTSPOTS[Math.floor(Math.random() * HOTSPOTS.length)];
       setSparkingHotspotId(spot.id);
       setSparkKey(k => k + 1);
-      setTimeout(() => setSparkingHotspotId(null), 1800);
+      const t = setTimeout(() => setSparkingHotspotId(null), 1800);
+      clearTimeouts.push(t);
     }, 5500);
 
-    return () => { clearInterval(interval); clearTimeout(clearFirst); };
+    return () => { clearInterval(interval); clearTimeout(clearFirst); clearTimeouts.forEach(clearTimeout); };
   }, [mapMode]);
 
   // Normal mode: track genuinely new Firestore markers
   const seenIds = useRef<Set<string> | null>(null);
   const [newMarkerIds, setNewMarkerIds] = useState(new Set<string>());
+  const clearMarkersTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const allCurrent = [
@@ -400,7 +403,9 @@ export default function MapPage() {
     }
     if (fresh.length > 0) {
       setNewMarkerIds(prev => new Set([...prev, ...fresh]));
-      setTimeout(() => setNewMarkerIds(new Set()), 2200);
+      // Cancel any pending clear so rapid updates don't wipe recently-added markers
+      if (clearMarkersTimeout.current) clearTimeout(clearMarkersTimeout.current);
+      clearMarkersTimeout.current = setTimeout(() => setNewMarkerIds(new Set()), 2200);
     }
   }, [activities, events]);
 
@@ -472,7 +477,7 @@ export default function MapPage() {
         style={{ background: "rgba(10,14,20,0.95)", backdropFilter: "blur(12px)", borderColor: mapMode === "corp" ? "#00B4E040" : "#ffffff15" }}
       >
         <button
-          className="flex items-center gap-1.5 px-4 py-2 text-xs font-black transition-all"
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B4E0] focus-visible:ring-inset"
           style={mapMode === "normal"
             ? { background: "#00B4E0", color: "#0d1117" }
             : { color: "#666", background: "transparent" }}
@@ -482,7 +487,7 @@ export default function MapPage() {
         </button>
         <div className="w-px h-5 bg-white/10 shrink-0" />
         <button
-          className="flex items-center gap-1.5 px-4 py-2 text-xs font-black transition-all"
+          className="flex items-center gap-1.5 px-4 py-2 text-xs font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6366f1] focus-visible:ring-inset"
           style={mapMode === "corp"
             ? { background: "linear-gradient(135deg,#00B4E0,#6366f1)", color: "#fff", boxShadow: "inset 0 0 20px #00B4E020" }
             : { color: "#666", background: "transparent" }}

@@ -79,9 +79,9 @@ export const DOPE_LEVELS: Record<number, { name: string; desc: string; emoji: st
   3:  { name: "Has a Sports Bag",       desc: "Looks the part, that's about it",          emoji: "🎒", color: "#eab308", glow: "#fde047", tier: "Backup"   },
   4:  { name: "YouTube Certified",      desc: "Studied the move, never landed it",        emoji: "📱", color: "#f97316", glow: "#fb923c", tier: "Solid"    },
   5:  { name: "Weekend Warrior",        desc: "Monday hero, Friday nobody",               emoji: "⚔️", color: "#78350f", glow: "#92400e", tier: "Pro"      },
-  6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#8b0000", glow: "#dc2626", tier: "Sharp"    },
-  7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#1f51ff", glow: "#60a5fa", tier: "Elite"    },
-  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "🔥", color: "#10b981", glow: "#34d399", tier: "Legendary"},
+  6:  { name: "The Regular",            desc: "Courts know the face, not the name",       emoji: "🏃", color: "#7f1d1d", glow: "#ef4444", tier: "Sharp"    },
+  7:  { name: "Local Legend",           desc: "People clear the court for them",          emoji: "🌟", color: "#1d4ed8", glow: "#60a5fa", tier: "Elite"    },
+  8:  { name: "Streets Know the Name",  desc: "Has a signature move and a nickname",      emoji: "🔥", color: "#065f46", glow: "#34d399", tier: "Legendary"},
   9:  { name: "Walking Highlight Reel", desc: "Only limited by his team",                 emoji: "🎥", color: "#fbbf24", glow: "#fde68a", tier: "Mythic"   },
   10: { name: "Too Dope to Explain",    desc: "The court bows before they enter",         emoji: "👑", color: "#5b21b6", glow: "#8b5cf6", tier: "Galactic" },
 };
