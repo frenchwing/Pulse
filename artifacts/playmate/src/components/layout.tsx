@@ -2,11 +2,14 @@ import { Link, useLocation } from "wouter";
 import { Plus, Map, List, Home, Users, GraduationCap, UserCircle } from "lucide-react";
 import { Bolt } from "@/components/bolt";
 import { Button } from "@/components/ui/button";
-import { getSessionProfileId } from "@/hooks/use-session";
+import { useAuth } from "@/hooks/use-auth";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
-  const profileId = getSessionProfileId();
+  // Reactive: auth.currentUser is null during Firebase's async session restore,
+  // so a plain getter would show "Join" to signed-in users on every refresh.
+  const { user } = useAuth();
+  const profileId = user?.uid ?? null;
 
   const navItem = (href: string, icon: React.ReactNode, label: string) => {
     const active = location === href || (href !== "/" && location.startsWith(href));

@@ -41,6 +41,16 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        // Split heavyweight vendors out of the app chunk so the first
+        // paint doesn't wait on one ~1.2 MB bundle.
+        manualChunks: {
+          "vendor-firebase": ["firebase/app", "firebase/auth", "firebase/firestore"],
+          "vendor-map": ["leaflet", "react-leaflet"],
+        },
+      },
+    },
   },
   server: {
     port,

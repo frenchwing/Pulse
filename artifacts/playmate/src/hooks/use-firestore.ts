@@ -13,7 +13,7 @@ export const profileKey = (id: string) => ["profile", id] as const;
 // ── Activities ────────────────────────────────────────────────────────────────
 
 export function useListActivities(filters?: Record<string, string>) {
-  return useQuery({ queryKey: activitiesKey(), queryFn: () => fs.listActivities(filters) });
+  return useQuery({ queryKey: [...activitiesKey(), filters ?? null], queryFn: () => fs.listActivities(filters) });
 }
 
 export function useGetActivity(id: string) {
@@ -54,7 +54,7 @@ export function useRateActivityPlayer(options?: MutationOptions) {
 // ── Events ────────────────────────────────────────────────────────────────────
 
 export function useListEvents(filters?: Record<string, string>) {
-  return useQuery({ queryKey: eventsKey(), queryFn: () => fs.listEvents(filters) });
+  return useQuery({ queryKey: [...eventsKey(), filters ?? null], queryFn: () => fs.listEvents(filters) });
 }
 
 export function useGetEvent(id: string) {
@@ -175,6 +175,7 @@ export function useGetSummaryStats() {
       totalEvents: events.length,
       totalProfiles: profiles.length,
       openActivities: activities.filter((a: any) => a.status === "open").length,
+      openEvents: events.filter((e: any) => e.status === "open").length,
     },
   };
 }

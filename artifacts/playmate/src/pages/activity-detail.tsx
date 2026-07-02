@@ -11,6 +11,7 @@ import { Loader2, Users, Calendar, Clock, MapPin, ArrowLeft, CheckCircle2, Star,
 import { dopeLevel, DOPE_LEVELS } from "@/lib/sport-meta";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { parseLocalDate } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
 function DopeBadge({ score }: { score: number }) {
@@ -121,7 +122,7 @@ export default function ActivityDetailPage() {
             <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 text-foreground">{activity.title}</h1>
             <div className="flex flex-wrap gap-4 text-muted-foreground text-sm font-medium">
               <span className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-md">
-                <Calendar className="w-4 h-4 text-primary" />{format(new Date(activity.date), "EEEE, MMMM d, yyyy")}
+                <Calendar className="w-4 h-4 text-primary" />{format(parseLocalDate(activity.date, activity.time), "EEEE, MMMM d, yyyy")}
               </span>
               <span className="flex items-center gap-1.5 bg-secondary/50 px-3 py-1.5 rounded-md">
                 <Clock className="w-4 h-4 text-primary" />{activity.time}
@@ -146,8 +147,9 @@ export default function ActivityDetailPage() {
               <div className="flex items-center gap-2">
                 <p className="font-bold">{activity.hostName}</p>
                 {avgRating && (
-                  <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-primary" title="Average player rating for this game">
                     <Star className="w-3 h-3 fill-primary" /> {avgRating}
+                    <span className="text-muted-foreground font-medium">avg player rating</span>
                   </span>
                 )}
               </div>
@@ -224,15 +226,15 @@ export default function ActivityDetailPage() {
               <div className="border-t border-border pt-4">
                 <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">Who's playing</p>
                 <div className="space-y-1.5">
-                  {participants.map((p, i) => (
-                    <div key={i} className="flex items-center gap-2 text-sm">
+                  {participants.map((p: any, i: number) => (
+                    <div key={p.profileId ?? `${p.name}-${i}`} className="flex items-center gap-2 text-sm">
                       <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-[10px] font-black text-secondary-foreground">
                         {p.name.charAt(0).toUpperCase()}
                       </div>
                       <span className={p.profileId === uid ? "font-bold text-primary" : "text-foreground"}>
                         {p.name}{p.profileId === uid ? " (you)" : ""}
                       </span>
-                      {i === 0 && <span className="text-[10px] text-muted-foreground uppercase tracking-wider ml-auto">Host</span>}
+                      {p.name === activity.hostName && <span className="text-[10px] text-muted-foreground uppercase tracking-wider ml-auto">Host</span>}
                     </div>
                   ))}
                 </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useListClubs, useSubmitClubInquiry, useListCorpBattles, useCreateCorpBattle, useCreateClub } from "@/hooks/use-firestore";
 type Club2 = any;
@@ -21,10 +21,15 @@ import { Bolt } from "@/components/bolt";
 
 // ── Corps clash intro ─────────────────────────────────────────────────────────
 function ClashIntro({ onDone }: { onDone: () => void }) {
+  // Keep the latest onDone in a ref: a parent re-render (e.g. data loading)
+  // passes a new function identity, and re-running the effect would restart
+  // the 1s timer while the CSS animation keeps going — leaving a blank page.
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
   useEffect(() => {
-    const t = setTimeout(onDone, 1000);
+    const t = setTimeout(() => onDoneRef.current(), 1000);
     return () => clearTimeout(t);
-  }, [onDone]);
+  }, []);
 
   return (
     <>
@@ -72,13 +77,13 @@ function ClashIntro({ onDone }: { onDone: () => void }) {
           animation: "clashFromLeft 1s cubic-bezier(0.35,0,0.55,1) forwards",
         }} />
 
-        {/* Orange bolt — from right, mirrored */}
+        {/* Orange bolt — from right, mirrored (matches the orange glow keyframes) */}
         <Bolt style={{
           position: "absolute",
           width: 210, height: 420,
           left: "calc(50% - 105px)",
           top:  "calc(50% - 210px)",
-          color: "#6366f1",
+          color: "#f97316",
           animation: "clashFromRight 1s cubic-bezier(0.35,0,0.55,1) forwards",
         }} />
 
@@ -271,7 +276,7 @@ function CorpCard({ corp }: { corp: Club2 }) {
         {/* CTA */}
         <Button
           size="sm"
-          className="w-full gap-2 font-black transition-all text-white"
+          className="w-full gap-2 font-black transition-all"
           style={open ? {
             background: "transparent",
             border: `1px solid ${hex.accent}40`,
@@ -280,6 +285,9 @@ function CorpCard({ corp }: { corp: Club2 }) {
             background: `linear-gradient(135deg, ${hex.accent}, ${hex.dim === "#080c10" ? hex.accent + "bb" : hex.dim})`,
             boxShadow: `0 0 20px ${hex.glow}30`,
             border: "none",
+            // hex.dim keeps the label readable on light accents (tennis
+            // yellow, pickleball green…) where white is ~1.2:1 contrast.
+            color: hex.dim,
           }}
           onClick={() => setOpen(v => !v)}
         >
@@ -447,7 +455,9 @@ function IssueBattleForm({ sport, corps, onClose }: { sport: string; corps: Club
         style={{ background: hex.accent, color: hex.dim }}
         disabled={!canSubmit || createBattle.isPending}
         onClick={() => createBattle.mutate({ data: {
-          corp1Id: Number(corp1Id), corp2Id: Number(corp2Id),
+          // Firestore doc ids are strings — Number() would produce NaN and the
+          // battle would never match its corps in BattleCard.
+          corp1Id, corp2Id,
           sport, scheduledAt: new Date(date).toISOString(), location: location || undefined,
         }})}
       >
@@ -493,7 +503,7 @@ function CreateCorpForm({ onClose }: { onClose: () => void }) {
         <div className="relative px-6 pt-8 pb-6 text-center border-b border-border"
           style={{ background: "radial-gradient(ellipse at 50% 0%, #00B4E015, transparent 70%)" }}
         >
-          <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
             <X className="w-5 h-5" />
           </button>
           <div className="text-5xl mb-3">⚔️</div>
@@ -771,7 +781,9 @@ function CorpsList({ sport, onBack }: { sport: string; onBack: () => void }) {
 export default function CorpsPage() {
   const params = useParams<{ sport?: string }>();
   const [, setLocation] = useLocation();
-  const [activeSport, setActiveSport] = useState<string | null>(params.sport ?? null);
+  // Derive the active sport from the URL so nav links and the browser
+  // back button always work — duplicating it in state went stale.
+  const activeSport = params.sport ?? null;
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [clashDone, setClashDone] = useState(false);
 
@@ -780,13 +792,11 @@ export default function CorpsPage() {
   const sportsWithCorps = [...new Set(allCorps.map(c => c.sport))].sort();
 
   const handleSelectSport = (sport: string) => {
-    setActiveSport(sport);
-    setLocation(`/corps/${sport}`, { replace: true });
+    setLocation(`/corps/${sport}`);
   };
 
   const handleBack = () => {
-    setActiveSport(null);
-    setLocation("/corps", { replace: true });
+    setLocation("/corps");
   };
 
   if (activeSport) {

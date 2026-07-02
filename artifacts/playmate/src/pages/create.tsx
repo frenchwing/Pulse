@@ -23,6 +23,12 @@ const getRandomAhmedabadLocation = () => {
   return { lat, lng };
 };
 
+// A game/event must start in the future — items whose start time has
+// already passed are filtered out of every feed by isExpired(), so a
+// past date would be created "successfully" but never be seen.
+const startsInFuture = (v: { date: string; time: string }) =>
+  new Date(`${v.date}T${v.time}`).getTime() > Date.now();
+
 const activitySchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   type: z.string().min(1, "Sport type is required"),
@@ -35,9 +41,9 @@ const activitySchema = z.object({
   venueFee: z.coerce.number().min(0).default(0),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
-  maxPlayers: z.coerce.number().min(2, "Must allow at least 2 players"),
+  maxPlayers: z.coerce.number().int("Whole number required").min(2, "Must allow at least 2 players").max(100, "Max 100 players"),
   hostName: z.string().min(2, "Name is required"),
-});
+}).refine(startsInFuture, { message: "Start time must be in the future", path: ["time"] });
 
 const eventSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -46,9 +52,9 @@ const eventSchema = z.object({
   address: z.string().min(5, "Please provide an address"),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
-  maxAttendees: z.coerce.number().min(2, "Must allow at least 2 attendees"),
+  maxAttendees: z.coerce.number().int("Whole number required").min(2, "Must allow at least 2 attendees").max(500, "Max 500 attendees"),
   hostName: z.string().min(2, "Name is required"),
-});
+}).refine(startsInFuture, { message: "Start time must be in the future", path: ["time"] });
 
 export default function CreatePage() {
   const [_, setLocation] = useLocation();
@@ -97,11 +103,12 @@ export default function CreatePage() {
     }
   });
 
-  // Prefill host name from the signed-in profile
+  // Prefill host name from the signed-in profile — but never clobber
+  // something the user already typed.
   useEffect(() => {
     if (profile?.name) {
-      activityForm.setValue("hostName", profile.name);
-      eventForm.setValue("hostName", profile.name);
+      if (!activityForm.getValues("hostName")) activityForm.setValue("hostName", profile.name);
+      if (!eventForm.getValues("hostName")) eventForm.setValue("hostName", profile.name);
     }
   }, [profile?.name]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -109,8 +116,8 @@ export default function CreatePage() {
     const loc = getRandomAhmedabadLocation();
     const payload: ActivityInput = {
       ...values,
-      // Tie hosting to the signed-in profile so the host is a tracked participant
-      hostName: profile?.name ?? values.hostName,
+      // Respect the (editable) name field; fall back to the profile name
+      hostName: values.hostName || profile?.name || "",
       hostProfileId: uid ?? null,
       latitude: loc.lat,
       longitude: loc.lng
@@ -122,7 +129,7 @@ export default function CreatePage() {
     const loc = getRandomAhmedabadLocation();
     const payload: EventInput = {
       ...values,
-      hostName: profile?.name ?? values.hostName,
+      hostName: values.hostName || profile?.name || "",
       hostProfileId: uid ?? null,
       latitude: loc.lat,
       longitude: loc.lng

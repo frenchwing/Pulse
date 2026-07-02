@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Users, Calendar, Clock, MapPin, Search } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
+import { parseLocalDate } from "@/lib/utils";
 import { Bolt } from "@/components/bolt";
 
 export default function BrowsePage() {
@@ -27,7 +28,7 @@ export default function BrowsePage() {
     }
     
     // Sort by date mostly
-    list.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    list.sort((a, b) => parseLocalDate(a.date, a.time).getTime() - parseLocalDate(b.date, b.time).getTime());
     
     if (search) {
       const q = search.toLowerCase();
@@ -93,7 +94,7 @@ export default function BrowsePage() {
       ) : combinedItems.length === 0 ? (
         <div className="text-center py-20 bg-card/50 rounded-xl border border-border border-dashed">
           <p className="text-muted-foreground mb-4">No activities or events found.</p>
-          <Button variant="outline" onClick={() => setSearch("")}>Clear Filters</Button>
+          <Button variant="outline" onClick={() => { setSearch(""); setFilterType("all"); }}>Clear Filters</Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -125,7 +126,7 @@ export default function BrowsePage() {
                   <div className="space-y-2 mb-4">
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <Calendar className="w-4 h-4" /> 
-                      {format(new Date(item.date), "MMM d, yyyy")} at {item.time}
+                      {format(parseLocalDate(item.date, item.time), "MMM d, yyyy")} at {item.time}
                     </p>
                     <p className="text-sm text-muted-foreground flex items-start gap-2">
                       <MapPin className="w-4 h-4 mt-0.5 shrink-0" /> 

@@ -363,9 +363,14 @@ function RegisterForm({ sport, onClose }: { sport: string; onClose: () => void }
   const hex = sportHex(sport || selectedSport || "other");
   const canSubmit = uniId && rollNo && fullName && selectedSport && skillLevel;
 
+  // Track the fake-submit timer so closing/unmounting mid-submit doesn't
+  // fire a success toast for a cancelled form.
+  const submitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (submitTimer.current) clearTimeout(submitTimer.current); }, []);
+
   function handleSubmit() {
     setSubmitting(true);
-    setTimeout(() => {
+    submitTimer.current = setTimeout(() => {
       setSubmitting(false);
       toast({
         title: "🎓 Registration submitted!",
@@ -383,7 +388,7 @@ function RegisterForm({ sport, onClose }: { sport: string; onClose: () => void }
         <h4 className="font-black text-sm flex items-center gap-2" style={{ color: hex.accent }}>
           <GraduationCap className="w-4 h-4" /> Register as a Varsity Athlete
         </h4>
-        <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-xs">✕</button>
+        <button onClick={onClose} aria-label="Close" disabled={submitting} className="text-muted-foreground hover:text-foreground text-xs disabled:opacity-50">✕</button>
       </div>
       <p className="text-xs text-muted-foreground">Your university ID will be verified before your profile goes live on the standings.</p>
 
@@ -802,7 +807,9 @@ function SportGrid({ onSelect }: { onSelect: (s: string) => void }) {
 export default function VarsityPage() {
   const params = useParams<{ sport?: string }>();
   const [, setLocation] = useLocation();
-  const [activeSport, setActiveSport] = useState<string | null>(params.sport ?? null);
+  // Derive the active sport from the URL so nav links and the browser
+  // back button always work — duplicating it in state went stale.
+  const activeSport = params.sport ?? null;
   const [showRegister, setShowRegister] = useState(false);
   const [throwingSport, setThrowingSport] = useState<string | null>(null);
 
@@ -813,13 +820,11 @@ export default function VarsityPage() {
   const onThrowDone = () => {
     const sport = throwingSport!;
     setThrowingSport(null);
-    setActiveSport(sport);
-    setLocation(`/varsity/${sport}`, { replace: true });
+    setLocation(`/varsity/${sport}`);
   };
 
   const handleBack = () => {
-    setActiveSport(null);
-    setLocation("/varsity", { replace: true });
+    setLocation("/varsity");
   };
 
   if (activeSport) {

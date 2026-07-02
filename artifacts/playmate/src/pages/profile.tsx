@@ -66,7 +66,12 @@ export default function ProfilePage() {
     return <div className="flex-1 flex items-center justify-center text-muted-foreground">Profile not found</div>;
   }
 
-  const userCrews = crews.filter(c => c.hostName.toLowerCase() === profile.name.toLowerCase() || (c.memberNames as string[]).some((m: string) => m.toLowerCase() === profile.name.toLowerCase()));
+  const myName = (profile.name ?? "").toLowerCase();
+  // Crew docs store leaderName (not hostName); guard memberNames for older docs.
+  const userCrews = crews.filter((c: any) =>
+    (c.leaderName ?? c.hostName ?? "").toLowerCase() === myName ||
+    ((c.memberNames as string[]) ?? []).some((m) => m.toLowerCase() === myName),
+  );
 
   const kycColor = profile.kycStatus === 'verified' ? 'bg-green-500/20 text-green-400' : profile.kycStatus === 'pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-500/20 text-gray-400';
 
@@ -148,7 +153,7 @@ export default function ProfilePage() {
             )}
 
             <div className="flex flex-wrap gap-2 pt-1">
-              {profile.sports?.map((s, i) => {
+              {profile.sports?.map((s: { sport: string; skillLevel: string }, i: number) => {
                 const sh = sportHex(s.sport);
                 return (
                   <Badge
@@ -195,7 +200,7 @@ export default function ProfilePage() {
               Reputation
             </h3>
             <div className="flex flex-wrap gap-2">
-              {profile.reputationTags.map((tag, i) => (
+              {profile.reputationTags.map((tag: string, i: number) => (
                 <Badge
                   key={i}
                   variant="outline"

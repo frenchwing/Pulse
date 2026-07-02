@@ -25,17 +25,23 @@ interface Hotspot {
   intensity: HotspotIntensity;
 }
 
-const HOTSPOTS: Hotspot[] = [
-  { id: 1, lat: 23.0469, lng: 72.5151, sport: "cricket",    name: "SGVP Cricket Ground",     active: 12, intensity: "high"   },
-  { id: 2, lat: 23.0285, lng: 72.5371, sport: "running",    name: "Vastrapur Lake Track",    active: 8,  intensity: "medium" },
-  { id: 3, lat: 23.0414, lng: 72.5264, sport: "basketball", name: "Bodakdev Courts",         active: 6,  intensity: "medium" },
-  { id: 4, lat: 23.0195, lng: 72.5087, sport: "cycling",    name: "SG Highway Strip",        active: 5,  intensity: "low"    },
-  { id: 5, lat: 23.0553, lng: 72.5293, sport: "badminton",  name: "Satellite Badminton Hub", active: 9,  intensity: "high"   },
-  { id: 6, lat: 23.0225, lng: 72.5633, sport: "tennis",     name: "Jodhpur Tennis Club",     active: 4,  intensity: "low"    },
-  { id: 7, lat: 23.0305, lng: 72.5714, sport: "football",   name: "Navrangpura Ground",      active: 11, intensity: "high"   },
-  { id: 8, lat: 23.0155, lng: 72.5521, sport: "swimming",   name: "Satellite Aqua Center",   active: 3,  intensity: "low"    },
-  { id: 9, lat: 23.0642, lng: 72.5430, sport: "volleyball", name: "Chandkheda Courts",       active: 7,  intensity: "medium" },
+// Intensity is derived from `active` so it always agrees with the legend:
+// High = 12+, Medium = 5–11, Low = 1–4.
+const hotspotIntensity = (active: number): HotspotIntensity =>
+  active >= 12 ? "high" : active >= 5 ? "medium" : "low";
+
+const HOTSPOT_DATA = [
+  { id: 1, lat: 23.0469, lng: 72.5151, sport: "cricket",    name: "SGVP Cricket Ground",     active: 12 },
+  { id: 2, lat: 23.0285, lng: 72.5371, sport: "running",    name: "Vastrapur Lake Track",    active: 8  },
+  { id: 3, lat: 23.0414, lng: 72.5264, sport: "basketball", name: "Bodakdev Courts",         active: 6  },
+  { id: 4, lat: 23.0195, lng: 72.5087, sport: "cycling",    name: "SG Highway Strip",        active: 5  },
+  { id: 5, lat: 23.0553, lng: 72.5293, sport: "badminton",  name: "Satellite Badminton Hub", active: 9  },
+  { id: 6, lat: 23.0225, lng: 72.5633, sport: "tennis",     name: "Jodhpur Tennis Club",     active: 4  },
+  { id: 7, lat: 23.0305, lng: 72.5714, sport: "football",   name: "Navrangpura Ground",      active: 11 },
+  { id: 8, lat: 23.0155, lng: 72.5521, sport: "swimming",   name: "Satellite Aqua Center",   active: 3  },
+  { id: 9, lat: 23.0642, lng: 72.5430, sport: "volleyball", name: "Chandkheda Courts",       active: 7  },
 ];
+const HOTSPOTS: Hotspot[] = HOTSPOT_DATA.map(h => ({ ...h, intensity: hotspotIntensity(h.active) }));
 
 // ── Sonar hotspot marker ───────────────────────────────────────────────────────
 
@@ -409,6 +415,11 @@ export default function MapPage() {
     }
   }, [activities, events]);
 
+  // Unmount-only: don't leave the pending clear firing after navigation
+  useEffect(() => () => {
+    if (clearMarkersTimeout.current) clearTimeout(clearMarkersTimeout.current);
+  }, []);
+
   return (
     <>
     <style>{`
@@ -480,7 +491,7 @@ export default function MapPage() {
           className="flex items-center gap-1.5 px-4 py-2 text-xs font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00B4E0] focus-visible:ring-inset"
           style={mapMode === "normal"
             ? { background: "#00B4E0", color: "#0d1117" }
-            : { color: "#666", background: "transparent" }}
+            : { color: "#9ca3af", background: "transparent" }}
           onClick={() => setMapMode("normal")}
         >
           <MapIcon className="w-3.5 h-3.5" /> Normal
@@ -490,7 +501,7 @@ export default function MapPage() {
           className="flex items-center gap-1.5 px-4 py-2 text-xs font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6366f1] focus-visible:ring-inset"
           style={mapMode === "corp"
             ? { background: "linear-gradient(135deg,#00B4E0,#6366f1)", color: "#fff", boxShadow: "inset 0 0 20px #00B4E020" }
-            : { color: "#666", background: "transparent" }}
+            : { color: "#9ca3af", background: "transparent" }}
           onClick={() => setMapMode("corp")}
         >
           <Crosshair className="w-3.5 h-3.5" />

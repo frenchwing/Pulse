@@ -87,7 +87,8 @@ export async function joinActivity(id: string, participant: { profileId: string;
     if (d.status === "full" || d.currentPlayers >= d.maxPlayers) throw new Error("Activity is full");
     const newCount = d.currentPlayers + 1;
     const newStatus = newCount >= d.maxPlayers ? "full" : "open";
-    const newCost = d.venueFee ? Math.round(d.venueFee / newCount) : d.estimatedCostPerPerson;
+    // Keep the estimate consistent with creation: venueFee split across maxPlayers
+    const newCost = d.venueFee && d.maxPlayers > 0 ? Math.round(d.venueFee / d.maxPlayers) : d.estimatedCostPerPerson;
     const newParticipants = [...participants, participant];
     tx.update(ref, { currentPlayers: newCount, status: newStatus, estimatedCostPerPerson: newCost, participants: newParticipants });
     return { ...d, id, currentPlayers: newCount, status: newStatus, participants: newParticipants };
@@ -168,14 +169,13 @@ export async function rateEventPlayer(eventId: string, data: any) {
 
 export async function getProfile(id: string) {
   const snap = await getDoc(doc(db, "profiles", id));
-  return snap.exists() ? { ...snap.data(), id: snap.id } : null;
+  return snap.exists() ? toObj<any>(snap) : null;
 }
 
 export async function getProfileByPhone(phone: string) {
   const snap = await getDocs(query(collection(db, "profiles"), where("phone", "==", phone)));
   if (snap.empty) return null;
-  const d = snap.docs[0];
-  return { ...d.data(), id: d.id };
+  return toObj<any>(snap.docs[0]);
 }
 
 export async function createProfile(uid: string, data: any) {
@@ -198,7 +198,7 @@ export async function updateProfile(id: string, data: any) {
 
 export async function listProfiles() {
   const snap = await getDocs(collection(db, "profiles"));
-  return snap.docs.map(d => ({ ...d.data(), id: d.id }));
+  return snap.docs.map(d => toObj<any>(d));
 }
 
 // ── Crews ─────────────────────────────────────────────────────────────────────

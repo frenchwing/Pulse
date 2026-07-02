@@ -23,7 +23,20 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useToast } from "@/hooks/use-toast";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
-const phoneSchema = z.object({ phone: z.string().min(10, "Valid phone number required") });
+// Normalize to the bare 10-digit Indian mobile: strip spaces/dashes,
+// a leading +91/91, or a leading 0 — "+91 98765 43210" would otherwise
+// become "+91+919876543210" and Firebase would reject it cryptically.
+const normalizePhone = (raw: string) => {
+  let d = raw.replace(/\D/g, "");
+  if (d.length > 10 && d.startsWith("91")) d = d.slice(-10);
+  if (d.length === 11 && d.startsWith("0")) d = d.slice(1);
+  return d;
+};
+const phoneSchema = z.object({
+  phone: z.string()
+    .transform(normalizePhone)
+    .refine((v) => /^[6-9]\d{9}$/.test(v), "Enter a valid 10-digit mobile number"),
+});
 const otpSchema = z.object({ code: z.string().length(6, "OTP must be 6 digits") });
 const profileSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -50,7 +63,7 @@ function FloatingBtn({
   onClick,
   disabled,
 }: {
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   speed?: number;
   startFx?: number;
   startFy?: number;
@@ -62,7 +75,7 @@ function FloatingBtn({
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const pos = useRef({ x: 0, y: 0, vx: speed, vy: speed * 0.7 });
-  const raf = useRef<number>();
+  const raf = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const btn = ref.current;
@@ -81,6 +94,9 @@ function FloatingBtn({
     btn.style.position = "absolute";
     btn.style.left = `${pos.current.x}px`;
     btn.style.top  = `${pos.current.y}px`;
+
+    // Respect reduced-motion: place the button statically, no bouncing.
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
 
     const tick = () => {
       const cw = box.clientWidth;
@@ -137,6 +153,13 @@ export default function OnboardingPage() {
     return () => { recaptchaRef.current?.clear(); };
   }, []);
 
+  // Firebase requires a fresh reCAPTCHA after a failed or consumed
+  // signInWithPhoneNumber — without this, every retry fails.
+  const resetRecaptcha = () => {
+    try { recaptchaRef.current?.clear(); } catch { /* already cleared */ }
+    recaptchaRef.current = new RecaptchaVerifier(auth, "recaptcha-container", { size: "invisible" });
+  };
+
   useEffect(() => {
     getRedirectResult(auth).then(async (credential) => {
       if (!credential) return;
@@ -185,13 +208,14 @@ export default function OnboardingPage() {
   const onPhoneSubmit = async (values: z.infer<typeof phoneSchema>) => {
     setIsSending(true);
     try {
-      const fullPhone = "+91" + values.phone.replace(/\s/g, "");
+      const fullPhone = "+91" + values.phone;
       setPhone(values.phone);
       const result = await signInWithPhoneNumber(auth, fullPhone, recaptchaRef.current!);
       setConfirmationResult(result);
       setShowOtp(true);
       toast({ title: "OTP sent", description: `Sent to +91 ${values.phone}` });
     } catch (err: any) {
+      resetRecaptcha();
       toast({ title: "Failed to send OTP", description: err.message, variant: "destructive" });
     } finally {
       setIsSending(false);
@@ -422,7 +446,7 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => setShowOtp(false)}
+                  onClick={() => { setShowOtp(false); resetRecaptcha(); }}
                 >
                   Wrong number? Go back
                 </button>

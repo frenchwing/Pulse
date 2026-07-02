@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useLocation, Link } from "wouter";
-import { format, formatDistanceToNow } from "date-fns";
+import { useLocation, useSearch } from "wouter";
+import { format, formatDistanceToNow, isPast } from "date-fns";
 import { useListActivities, useListEvents, useJoinActivity, activitiesKey } from "@/hooks/use-firestore";
 import { useSessionProfile } from "@/hooks/use-session";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,11 +20,15 @@ type FeedItem = (Activity & { isEvent?: false }) | (Event & { isEvent: true });
 
 export default function FeedPage() {
   const [_, setLocation] = useLocation();
+  const search = useSearch();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { uid, profile } = useSessionProfile();
-  
-  const [filterType, setFilterType] = useState<string>("All");
+
+  // Landing page sport chips link to /feed?type=<sport> — honor it.
+  const [filterType, setFilterType] = useState<string>(
+    () => new URLSearchParams(search).get("type") ?? "All",
+  );
   const [filterSkill, setFilterSkill] = useState<string>("All Skills");
   const [womenOnly, setWomenOnly] = useState(false);
   
@@ -139,7 +143,7 @@ export default function FeedPage() {
               </Badge>
             )}
           </div>
-          <Badge className={`${statusColor} capitalize hover:${statusColor}`}>
+          <Badge className={`capitalize ${item.status === "open" ? "bg-green-500/20 text-green-400 hover:bg-green-500/20" : "bg-red-500/20 text-red-400 hover:bg-red-500/20"}`}>
             {item.status}
           </Badge>
         </div>
@@ -158,7 +162,11 @@ export default function FeedPage() {
             <div className="flex flex-col">
               <span className="font-medium text-foreground">{format(dateObj, 'MMM d, h:mm a')}</span>
               {(item as any).expiresAt && (
-                <span className="text-xs text-amber-400">Expires {formatDistanceToNow(new Date((item as any).expiresAt))}</span>
+                <span className="text-xs text-amber-400">
+                  {isPast(new Date((item as any).expiresAt))
+                    ? `Expired ${formatDistanceToNow(new Date((item as any).expiresAt), { addSuffix: true })}`
+                    : `Expires ${formatDistanceToNow(new Date((item as any).expiresAt), { addSuffix: true })}`}
+                </span>
               )}
             </div>
           </div>
@@ -251,19 +259,6 @@ export default function FeedPage() {
             <span className="text-foreground font-black">{openGames}</span> games · <span className="text-foreground font-black">{openEvents}</span> events open right now
           </p>
           
-          <div className="flex flex-wrap items-center gap-4 mb-6">
-            <div className="flex bg-secondary p-1 rounded-full">
-              {['1km', '5km', '10km'].map(r => (
-                <button key={r} className={`px-4 py-1.5 rounded-full text-sm font-bold transition-colors ${r === '5km' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
-                  {r}
-                </button>
-              ))}
-            </div>
-            <p className="text-muted-foreground text-sm font-medium">
-              <span className="text-foreground">{openGames}</span> games and <span className="text-foreground">{openEvents}</span> events open right now
-            </p>
-          </div>
-
           <ScrollArea className="w-full whitespace-nowrap pb-4">
             <div className="flex items-center gap-2">
               {['All', 'Sports', 'Social', 'Fitness', 'Coffee', 'Adventure', 'Hobby'].map(f => (

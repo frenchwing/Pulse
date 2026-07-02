@@ -62,21 +62,23 @@ export function PlayerCardModal({ open, onOpenChange, profile, dopeRating }: Pla
           }
           .pc-wrap     { animation: pc-enter 600ms cubic-bezier(.2,.7,.2,1.3) backwards,
                                     pc-float 4.5s ease-in-out 800ms infinite; }
-          .pc-mythic   { background: linear-gradient(120deg, #5b21b6, #8b5cf6, #c4b5fd, #8b5cf6, #5b21b6);
-                         background-size: 300% 300%; animation: pc-mythic 4s linear infinite; }
-          .pc-galactic { background: linear-gradient(135deg, #fbbf24 0%, #fde68a 50%, #fbbf24 100%);
-                         animation: pc-galactic-pulse 2.2s ease-in-out infinite; }
+          /* T9 Mythic is the GOLD tier (#fbbf24) → gold pulsing border */
+          .pc-gold-pulse     { background: linear-gradient(135deg, #fbbf24 0%, #fde68a 50%, #fbbf24 100%);
+                               animation: pc-galactic-pulse 2.2s ease-in-out infinite; }
+          /* T10 Galactic is the PURPLE tier (#5b21b6) → purple shimmer border */
+          .pc-purple-shimmer { background: linear-gradient(120deg, #5b21b6, #8b5cf6, #c4b5fd, #8b5cf6, #5b21b6);
+                               background-size: 300% 300%; animation: pc-mythic 4s linear infinite; }
           .pc-shine    { animation: pc-shine 2.6s ease-in-out 700ms infinite; }
         `}</style>
 
         <div className="pc-wrap relative" style={{ perspective: 1200 }}>
           {/* OUTER BORDER — color driven by dope tier */}
           <div
-            className={`rounded-3xl p-[4px] relative ${isMythic ? "pc-mythic" : isGalactic ? "pc-galactic" : ""}`}
+            className={`rounded-3xl p-[4px] relative ${isMythic ? "pc-gold-pulse" : isGalactic ? "pc-purple-shimmer" : ""}`}
             style={
-              isMythic
+              isGalactic
                 ? { boxShadow: `0 0 70px #8b5cf6cc, 0 20px 60px #5b21b6aa` }
-                : isGalactic
+                : isMythic
                 ? undefined
                 : {
                     background: `linear-gradient(135deg, ${dope.glow} 0%, #ffffff 50%, ${dope.glow} 100%)`,
@@ -179,8 +181,7 @@ export function PlayerCardModal({ open, onOpenChange, profile, dopeRating }: Pla
                 {(profile.locationArea || profile.locationCity) && (
                   <p className="text-[11px] text-muted-foreground mt-1 flex items-center justify-center gap-1">
                     <MapPin className="w-3 h-3" style={{ color: hex.accent }} />
-                    {profile.locationArea || "Ahmedabad"}
-                    {profile.locationCity ? `, ${profile.locationCity}` : ""}
+                    {[profile.locationArea, profile.locationCity].filter(Boolean).join(", ") || "Ahmedabad"}
                   </p>
                 )}
               </div>

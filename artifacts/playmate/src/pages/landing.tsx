@@ -80,10 +80,12 @@ function FloatingOrb({
 function SportChip({ label, onClick }: { label: string; onClick: () => void }) {
   const [popped, setPopped] = useState(false);
   const hex = SPORT_HEX[label.toLowerCase()] ?? { accent: "#00B4E0", glow: "#0891b2", dim: "#031a20" };
+  const popTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (popTimer.current) clearTimeout(popTimer.current); }, []);
 
   const handleClick = () => {
     setPopped(true);
-    setTimeout(() => setPopped(false), 300);
+    popTimer.current = setTimeout(() => setPopped(false), 300);
     onClick();
   };
 
